@@ -8,11 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Ana yazı tipi olarak Inter kullanıyoruz, saat için Orbitron */
+        /* Main font is Inter, Orbitron for clocks */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #1a202c; /* Koyu arka plan */
-            color: #e2e8f0; /* Açık metin rengi */
+            background-color: #1a202c; /* Dark background */
+            color: #e2e8f0; /* Light text color */
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -20,118 +20,172 @@
             align-items: center;
             padding: 20px;
             box-sizing: border-box;
-            overflow-x: hidden; /* Yatay kaydırmayı engelle */
+            overflow-x: hidden; /* Prevent horizontal scrolling */
         }
 
-        /* Ana başlık stili */
+        /* Main title style */
         .main-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 3.5rem; /* Büyük başlık boyutu */
+            font-size: 3.5rem; /* Large title size */
             font-weight: 700;
-            color: #66e0ff; /* Parlak mavi */
+            color: #66e0ff; /* Bright blue */
             text-shadow: 0 0 15px rgba(102, 224, 255, 0.7), 0 0 25px rgba(102, 224, 255, 0.5);
-            margin-bottom: 2.5rem; /* Alt boşluk */
+            margin-bottom: 2.5rem; /* Bottom margin */
             text-align: center;
         }
 
-        /* Saatlerin genel kapsayıcısı */
+        /* Search area style */
+        .search-area {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .search-input {
+            flex-grow: 1;
+            padding: 0.75rem 1.25rem;
+            border-radius: 9999px; /* Fully rounded */
+            border: 1px solid #4a5568;
+            background-color: #2d3748;
+            color: #e2e8f0;
+            font-size: 1.1rem;
+            outline: none;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: #a0aec0;
+        }
+
+        .search-input:focus {
+            border-color: #66e0ff;
+            box-shadow: 0 0 0 3px rgba(102, 224, 255, 0.5);
+        }
+
+        .search-button {
+            background-color: #6366f1; /* Mor buton */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px; /* Fully rounded */
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-button:hover {
+            background-color: #4f46e5; /* Hover'da daha koyu mor */
+            transform: translateY(-2px);
+        }
+
+        .search-button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+
+        /* General container for clocks */
         .clocks-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Duyarlı grid yapısı, daha küçük başlangıç boyutu */
-            gap: 1.5rem; /* Saatler arası boşluk */
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Responsive grid structure, smaller initial size */
+            gap: 1.5rem; /* Gap between clocks */
             max-width: 1400px;
             width: 100%;
             justify-content: center;
             align-items: start;
         }
 
-        /* Her bir saat kartının kapsayıcısı */
+        /* Container for each clock card */
         .clock-container {
-            background-color: #2d3748; /* Koyu gri kart arka planı */
-            border-radius: 1.5rem; /* Yuvarlak köşeler */
-            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.4); /* Derin gölge */
-            padding: 1.5rem; /* İç boşluk */
+            background-color: #2d3748; /* Dark gray card background */
+            border-radius: 1.5rem; /* Rounded corners */
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.4); /* Deep shadow */
+            padding: 1.5rem; /* Inner padding */
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1rem; /* Öğeler arası boşluk */
-            cursor: pointer; /* Tıklanabilir olduğunu belirtir */
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, opacity 0.3s ease; /* Yumuşak geçişler */
-            position: relative; /* Z-index için */
-            z-index: 1; /* Varsayılan z-index */
+            gap: 1rem; /* Gap between elements */
+            cursor: pointer; /* Indicates it's clickable */
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, opacity 0.3s ease; /* Smooth transitions */
+            position: relative; /* For z-index */
+            z-index: 1; /* Default z-index */
         }
 
         .clock-container:hover {
-            transform: translateY(-5px); /* Hover efekti */
+            transform: translateY(-5px); /* Hover effect */
             box-shadow: 0 15px 30px -8px rgba(0, 0, 0, 0.6);
         }
 
-        /* Şehir adı stili */
+        /* City name style */
         .city-name {
-            font-size: 1.5rem; /* Şehir adı font boyutu, daha küçük */
+            font-size: 1.5rem; /* Smaller city name font size */
             font-weight: 700;
-            color: #a0aec0; /* Açık gri */
+            color: #a0aec0; /* Light gray */
             margin-bottom: 0.5rem;
         }
 
-        /* Dijital saat stili */
+        /* Digital clock style */
         .digital-clock {
-            font-family: 'Orbitron', sans-serif; /* Dijital saat için özel font */
-            font-size: 2.2rem; /* Daha küçük font boyutu */
+            font-family: 'Orbitron', sans-serif; /* Special font for digital clock */
+            font-size: 2.2rem; /* Smaller font size */
             font-weight: 700;
-            color: #66e0ff; /* Parlak mavi */
-            text-shadow: 0 0 8px rgba(102, 224, 255, 0.4), 0 0 12px rgba(102, 224, 255, 0.2); /* Neon efekti */
-            letter-spacing: 0.05em; /* Harfler arası boşluk */
+            color: #66e0ff; /* Bright blue */
+            text-shadow: 0 0 8px rgba(102, 224, 255, 0.4), 0 0 12px rgba(102, 224, 255, 0.2); /* Neon effect */
+            letter-spacing: 0.05em; /* Letter spacing */
             padding: 0.3rem 0;
-            border-bottom: 1px solid #4a5568; /* Alt çizgi */
+            border-bottom: 1px solid #4a5568; /* Bottom border */
             width: 100%;
         }
 
-        /* Analog saat kapsayıcısı */
+        /* Analog clock container */
         .analog-clock-wrapper {
             position: relative;
-            width: 180px; /* Saatin genişliği, daha küçük */
-            height: 180px; /* Saatin yüksekliği, daha küçük */
-            border-radius: 50%; /* Dairesel şekil */
-            background-color: #f0f4f8; /* Açık renk saat yüzü */
-            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1), 0 0 15px rgba(0, 0, 0, 0.3); /* İç ve dış gölge */
-            border: 5px solid #4a5568; /* Kalın dış kenarlık */
+            width: 180px; /* Clock width, smaller */
+            height: 180px; /* Clock height, smaller */
+            border-radius: 50%; /* Circular shape */
+            background-color: #f0f4f8; /* Light clock face color */
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1), 0 0 15px rgba(0, 0, 0, 0.3); /* Inner and outer shadow */
+            border: 5px solid #4a5568; /* Thick outer border */
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* Saat merkez noktası */
+        /* Clock center point */
         .analog-clock-wrapper::before {
             content: '';
             position: absolute;
-            width: 12px; /* Daha küçük merkez nokta */
+            width: 12px; /* Smaller center point */
             height: 12px;
-            background-color: #1a202c; /* Merkez nokta rengi */
+            background-color: #1a202c; /* Center point color */
             border-radius: 50%;
             z-index: 10;
             box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
         }
 
-        /* Saat ibreleri için temel stil */
+        /* Base style for clock hands */
         .hand {
             position: absolute;
-            transform-origin: bottom center; /* İbrelerin altından dönmesini sağlar */
-            border-radius: 3px; /* Daha ince ibreler */
+            transform-origin: bottom center; /* Hands rotate from their bottom center */
+            border-radius: 3px; /* Thinner hands */
             z-index: 5;
         }
 
-        /* Akrep (Saat ibresi) */
+        /* Hour hand */
         .hour-hand {
             width: 5px;
-            height: 50px; /* Daha kısa ibreler */
+            height: 50px; /* Shorter hand */
             background-color: #333;
             top: calc(50% - 50px);
             left: calc(50% - 2.5px);
         }
 
-        /* Yelkovan (Dakika ibresi) */
+        /* Minute hand */
         .minute-hand {
             width: 3px;
             height: 75px;
@@ -140,46 +194,46 @@
             left: calc(50% - 1.5px);
         }
 
-        /* Saniye ibresi */
+        /* Second hand */
         .second-hand {
             width: 1px;
             height: 85px;
-            background-color: #ef4444; /* Kırmızı saniye ibresi */
+            background-color: #ef4444; /* Red second hand */
             top: calc(50% - 85px);
             left: calc(50% - 0.5px);
             z-index: 6;
         }
 
-        /* Sayı işaretleri için */
+        /* Number markers */
         .number {
             position: absolute;
-            font-size: 0.9rem; /* Daha küçük sayılar */
+            font-size: 0.9rem; /* Smaller numbers */
             font-weight: 600;
             color: #4a5568;
             transform: translate(-50%, -50%);
         }
 
-        /* Aktif (büyütülmüş) saat stili */
+        /* Active (enlarged) clock style */
         .clock-container.active {
-            position: fixed; /* Ekranın ortasına sabitler */
+            position: fixed; /* Fixes it to the center of the screen */
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) scale(1.2); /* Büyütme oranı 1.4'ten 1.2'ye düşürüldü */
-            z-index: 100; /* Diğer her şeyin üstünde görünür */
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.7); /* Daha belirgin gölge */
-            padding: 3rem; /* Daha fazla boşluk */
-            width: auto; /* İçeriğe göre genişlik */
-            max-width: 500px; /* Maksimum genişlik */
+            transform: translate(-50%, -50%) scale(1.2); /* Enlargement scale reduced to 1.2 */
+            z-index: 100; /* Appears above everything else */
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.7); /* More prominent shadow */
+            padding: 3rem; /* More padding */
+            width: auto; /* Width based on content */
+            max-width: 500px; /* Maximum width */
         }
 
         .clock-container.active .city-name {
-            font-size: 2.5rem; /* Büyüyünce font boyutu */
+            font-size: 2.5rem; /* Font size when enlarged */
         }
         .clock-container.active .digital-clock {
-            font-size: 4rem; /* Büyüyünce font boyutu */
+            font-size: 4rem; /* Font size when enlarged */
         }
         .clock-container.active .analog-clock-wrapper {
-            width: 300px; /* Büyüyünce analog saat boyutu */
+            width: 300px; /* Analog clock size when enlarged */
             height: 300px;
             border-width: 8px;
         }
@@ -209,15 +263,15 @@
             font-size: 1.2rem;
         }
 
-        /* Arka plan karartma katmanı */
+        /* Background overlay layer */
         .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); /* Yarı şeffaf siyah */
-            z-index: 99; /* Büyüyen saatin altında, diğerlerinin üstünde */
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
+            z-index: 99; /* Below enlarged clock, above others */
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -228,14 +282,21 @@
             visibility: visible;
         }
 
-        /* Medya sorguları: Mobil uyumluluk */
+        /* Media queries: Mobile responsiveness */
         @media (max-width: 768px) {
             .main-title {
                 font-size: 2.5rem;
                 margin-bottom: 1.5rem;
             }
+            .search-area {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            .search-input, .search-button {
+                width: 100%;
+            }
             .clocks-grid {
-                grid-template-columns: 1fr; /* Mobil için tek sütun */
+                grid-template-columns: 1fr; /* Single column for mobile */
                 gap: 1.5rem;
             }
             .clock-container {
@@ -279,11 +340,11 @@
                 font-size: 0.8rem;
             }
 
-            /* Aktif (büyütülmüş) saat mobil stili */
+            /* Active (enlarged) clock mobile style */
             .clock-container.active {
-                transform: translate(-50%, -50%) scale(1.1); /* Mobil için biraz daha az büyütme */
+                transform: translate(-50%, -50%) scale(1.1); /* Slightly less enlargement for mobile */
                 padding: 2rem;
-                max-width: 90%; /* Mobil ekranı aşmasını engelle */
+                max-width: 90%; /* Prevent exceeding mobile screen */
             }
             .clock-container.active .city-name {
                 font-size: 2rem;
@@ -327,8 +388,14 @@
 <body class="antialiased">
     <h1 class="main-title">Dünya Saatleri</h1>
 
+    <!-- Arama Alanı Eklendi -->
+    <div class="search-area">
+        <input type="text" id="searchInput" placeholder="Şehir veya ülke ara..." class="search-input">
+        <button id="searchButton" class="search-button">Ara</button>
+    </div>
+
     <div class="clocks-grid">
-        <!-- Her bir saat için dinamik olarak eklenecek -->
+        <!-- Her bir saat dinamik olarak buraya eklenecek -->
     </div>
 
     <!-- Arka plan karartma katmanı -->
@@ -345,12 +412,56 @@
             { id: 'tokyo', name: 'Tokyo, Japonya', timeZone: 'Asia/Tokyo' },
             { id: 'sydney', name: 'Sydney, Avustralya', timeZone: 'Australia/Sydney' },
             { id: 'london', name: 'Londra, İngiltere', timeZone: 'Europe/London' },
-            { id: 'dubai', name: 'Dubai, BAE', timeZone: 'Asia/Dubai' } // Yeni eklenen ülke
+            { id: 'dubai', name: 'Dubai, BAE', timeZone: 'Asia/Dubai' },
+            { id: 'paris', name: 'Paris, Fransa', timeZone: 'Europe/Paris' },
+            { id: 'rome', name: 'Roma, İtalya', timeZone: 'Europe/Rome' },
+            { id: 'madrid', name: 'Madrid, İspanya', timeZone: 'Europe/Madrid' },
+            { id: 'amsterdam', name: 'Amsterdam, Hollanda', timeZone: 'Europe/Amsterdam' },
+            { id: 'warsaw', name: 'Varşova, Polonya', timeZone: 'Europe/Warsaw' },
+            { id: 'moscow', name: 'Moskova, Rusya', timeZone: 'Europe/Moscow' },
+            { id: 'stockholm', name: 'Stockholm, İsveç', timeZone: 'Europe/Stockholm' },
+            { id: 'oslo', name: 'Oslo, Norveç', timeZone: 'Europe/Oslo' },
+            { id: 'zurich', name: 'Zürih, İsviçre', timeZone: 'Europe/Zurich' },
+            { id: 'toronto', name: 'Toronto, Kanada', timeZone: 'America/Toronto' },
+            { id: 'mexico-city', name: 'Meksiko, Meksika', timeZone: 'America/Mexico_City' },
+            { id: 'sao-paulo', name: 'Sao Paulo, Brezilya', timeZone: 'America/Sao_Paulo' },
+            { id: 'buenos-aires', name: 'Buenos Aires, Arjantin', timeZone: 'America/Argentina/Buenos_Aires' },
+            { id: 'santiago', name: 'Santiago, Şili', timeZone: 'America/Santiago' },
+            { id: 'bogota', name: 'Bogota, Kolombiya', timeZone: 'America/Bogota' },
+            { id: 'shanghai', name: 'Şanghay, Çin', timeZone: 'Asia/Shanghai' },
+            { id: 'kolkata', name: 'Kalküta, Hindistan', timeZone: 'Asia/Kolkata' },
+            { id: 'seoul', name: 'Seul, Güney Kore', timeZone: 'Asia/Seoul' },
+            { id: 'jakarta', name: 'Cakarta, Endonezya', timeZone: 'Asia/Jakarta' },
+            { id: 'riyadh', name: 'Riyad, Suudi Arabistan', timeZone: 'Asia/Riyadh' },
+            { id: 'johannesburg', name: 'Johannesburg, Güney Afrika', timeZone: 'Africa/Johannesburg' },
+            { id: 'lagos', name: 'Lagos, Nijerya', timeZone: 'Africa/Lagos' },
+            { id: 'cairo', name: 'Kahire, Mısır', timeZone: 'Africa/Cairo' },
+            { id: 'nairobi', name: 'Nairobi, Kenya', timeZone: 'Africa/Nairobi' },
+            { id: 'casablanca', name: 'Kazablanka, Fas', timeZone: 'Africa/Casablanca' },
+            { id: 'brussels', name: 'Brüksel, Belçika', timeZone: 'Europe/Brussels' },
+            { id: 'vienna', name: 'Viyana, Avusturya', timeZone: 'Europe/Vienna' },
+            { id: 'copenhagen', name: 'Kopenhag, Danimarka', timeZone: 'Europe/Copenhagen' },
+            { id: 'helsinki', name: 'Helsinki, Finlandiya', timeZone: 'Europe/Helsinki' },
+            { id: 'athens', name: 'Atina, Yunanistan', timeZone: 'Europe/Athens' },
+            { id: 'prague', name: 'Prag, Çekya', timeZone: 'Europe/Prague' },
+            { id: 'budapest', name: 'Budapeşte, Macaristan', timeZone: 'Europe/Budapest' },
+            { id: 'dublin', name: 'Dublin, İrlanda', timeZone: 'Europe/Dublin' },
+            { id: 'lisbon', name: 'Lizbon, Portekiz', timeZone: 'Europe/Lisbon' },
+            { id: 'sofia', name: 'Sofya, Bulgaristan', timeZone: 'Europe/Sofia' },
+            { id: 'bucharest', name: 'Bükreş, Romanya', timeZone: 'Europe/Bucharest' },
+            { id: 'bangkok', name: 'Bangkok, Tayland', timeZone: 'Asia/Bangkok' },
+            { id: 'ho-chi-minh', name: 'Ho Chi Minh, Vietnam', timeZone: 'Asia/Ho_Chi_Minh' },
+            { id: 'doha', name: 'Doha, Katar', timeZone: 'Asia/Qatar' },
+            { id: 'tehran', name: 'Tahran, İran', timeZone: 'Asia/Tehran' }
         ];
 
         const clocksGrid = document.querySelector('.clocks-grid');
         const overlay = document.getElementById('overlay');
         let activeClock = null; // Aktif (büyütülmüş) saati takip etmek için
+
+        // Arama alanı ve butonu
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
 
         // Her bir saat için HTML yapısını oluşturan fonksiyon
         function createClockHTML(clockInfo) {
@@ -378,9 +489,17 @@
         }
 
         // Tüm saatler için HTML yapısını oluştur
-        clocksData.forEach(clock => {
-            createClockHTML(clock);
-        });
+        function renderClocks(filteredClocks) {
+            clocksGrid.innerHTML = ''; // Mevcut saatleri temizle
+            filteredClocks.forEach(clock => {
+                createClockHTML(clock);
+            });
+            // Saatleri tekrar güncelleyelim, çünkü DOM değişti
+            clocksData.forEach(clock => updateClock(clock));
+        }
+
+        // Başlangıçta tüm saatleri göster
+        renderClocks(clocksData);
 
         // Belirli bir saat dilimi için saati güncelleyen fonksiyon
         function updateClock(clockInfo) {
@@ -391,7 +510,7 @@
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
-                hour12: false, // 24 saat formatı
+                hour12: false, // 24-hour format
                 timeZone: clockInfo.timeZone
             };
             const timeString = now.toLocaleString('en-US', options); // Formatlanmış zaman stringi
@@ -414,11 +533,9 @@
                 const currentSeconds = parseInt(now.toLocaleString('en-US', { second: 'numeric', timeZone: clockInfo.timeZone }));
 
                 // İbrelerin açılarını hesapla
-                // Her saat 360/12 = 30 derece
-                // Her dakika/saniye 360/60 = 6 derece
-                const secondDegrees = (currentSeconds * 6) + 90; // +90 çünkü CSS transform başlangıcı 0 derece sağa bakar
-                const minuteDegrees = (currentMinutes * 6) + (currentSeconds * 0.1) + 90; // Saniyelerden gelen küçük hareket
-                const hourDegrees = (currentHours % 12 * 30) + (currentMinutes * 0.5) + 90; // Dakikalardan gelen küçük hareket
+                const secondDegrees = (currentSeconds * 6) + 90;
+                const minuteDegrees = (currentMinutes * 6) + (currentSeconds * 0.1) + 90;
+                const hourDegrees = (currentHours % 12 * 30) + (currentMinutes * 0.5) + 90;
 
                 secondHandElement.style.transform = `rotate(${secondDegrees}deg)`;
                 minuteHandElement.style.transform = `rotate(${minuteDegrees}deg)`;
@@ -428,8 +545,8 @@
 
         // Saati büyütme/küçültme işlevi
         function toggleClockEnlargement(clickedClock) {
+            // Eğer aktif bir saat varsa ve tıklanan saat o değilse, aktif saati küçült
             if (activeClock && activeClock !== clickedClock) {
-                // Başka bir saat zaten aktifse, onu küçült
                 activeClock.classList.remove('active');
             }
 
@@ -439,10 +556,10 @@
             if (clickedClock.classList.contains('active')) {
                 activeClock = clickedClock;
                 overlay.classList.add('show'); // Arka planı karart
-                // Aktif olmayan saatleri hafifçe soluklaştır
+                // Aktif olmayan saatleri hafifçe soluklaştır ve tıklanamaz yap
                 document.querySelectorAll('.clock-container:not(.active)').forEach(clock => {
                     clock.style.opacity = '0.3';
-                    clock.style.pointerEvents = 'none'; // Tıklamayı engelle
+                    clock.style.pointerEvents = 'none';
                 });
             } else {
                 activeClock = null;
@@ -459,6 +576,44 @@
         overlay.addEventListener('click', () => {
             if (activeClock) {
                 toggleClockEnlargement(activeClock); // Aktif saati kapat
+            }
+        });
+
+        // Arama fonksiyonu
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            let filteredClocks = [];
+
+            if (searchTerm === '') {
+                filteredClocks = clocksData; // Arama boşsa tüm saatleri göster
+            } else {
+                // Şehir veya ülke adına göre filtrele
+                filteredClocks = clocksData.filter(clock =>
+                    clock.name.toLowerCase().includes(searchTerm)
+                );
+            }
+            renderClocks(filteredClocks); // Filtrelenmiş saatleri yeniden render et
+
+            // Eğer büyütülmüş bir saat varsa ve arama sonucu o saati gizlediyse, küçült
+            if (activeClock && !filteredClocks.some(clock => `clock-container-${clock.id}` === activeClock.id)) {
+                toggleClockEnlargement(activeClock);
+            }
+        }
+
+        // Arama butonu olay dinleyicisi
+        searchButton.addEventListener('click', performSearch);
+
+        // Arama inputunda Enter tuşuna basıldığında
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Arama inputu boşaldığında tüm saatleri tekrar göstermek için
+        searchInput.addEventListener('input', () => {
+            if (searchInput.value.trim() === '') {
+                performSearch();
             }
         });
 
