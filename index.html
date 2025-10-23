@@ -1,632 +1,1297 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dünya Saatleri</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* Main font is Inter, Orbitron for clocks */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #1a202c; /* Dark background */
-            color: #e2e8f0; /* Light text color */
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-            overflow-x: hidden; /* Prevent horizontal scrolling */
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MuAi - Kod Üretimi ve Gelişmiş Kontrol</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Theme Variables */
+  :root {
+    --bg-color-light: #f3f4f6;
+    --bg-color-dark: #111827;
+    --text-color-light: #1f2937;
+    --text-color-dark: #e5e7eb;
+    --card-bg-light: #ffffff;
+    --card-bg-dark: #1f2937;
+    --input-bg-light: #ffffff;
+    --input-bg-dark: #374151;
+  }
+  body { 
+    font-family: 'Inter', sans-serif; 
+    transition: background-color 0.3s, color 0.3s;
+    background-color: var(--bg-color-light); 
+    color: var(--text-color-light);
+  }
 
-        /* Main title style */
-        .main-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3.5rem; /* Large title size */
-            font-weight: 700;
-            color: #66e0ff; /* Bright blue */
-            text-shadow: 0 0 15px rgba(102, 224, 255, 0.7), 0 0 25px rgba(102, 224, 255, 0.5);
-            margin-bottom: 2.5rem; /* Bottom margin */
-            text-align: center;
-        }
+  /* Dark Mode Styles */
+  html.dark body {
+    background-color: var(--bg-color-dark);
+    color: var(--text-color-dark);
+  }
+  html.dark .header, html.dark .input-area, html.dark #chatListSidebar {
+    background-color: #1f2937; 
+    border-color: #374151;
+  }
+  html.dark .ai-bubble {
+    background-color: var(--input-bg-dark);
+    color: var(--text-color-dark);
+  }
+  html.dark #messageInput {
+    background-color: var(--input-bg-dark);
+    color: var(--text-color-dark);
+    border-color: #4b5563;
+  }
 
-        /* Search area style */
-        .search-area {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            width: 100%;
-            max-width: 600px;
-        }
+  /* Chat Bubble & Scrollbar */
+  #chatArea::-webkit-scrollbar { width: 8px; }
+  #chatArea::-webkit-scrollbar-thumb { background-color: #9ca3af; border-radius: 4px; }
+  #chatArea::-webkit-scrollbar-track { background-color: #f5f5f5; }
+  html.dark #chatArea::-webkit-scrollbar-thumb { background-color: #6b7280; }
+  html.dark #chatArea::-webkit-scrollbar-track { background-color: #374151; }
 
-        .search-input {
-            flex-grow: 1;
-            padding: 0.75rem 1.25rem;
-            border-radius: 9999px; /* Fully rounded */
-            border: 1px solid #4a5568;
-            background-color: #2d3748;
-            color: #e2e8f0;
-            font-size: 1.1rem;
-            outline: none;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
+  .chat-bubble {
+    padding: 12px;
+    border-radius: 16px;
+    max-width: 80%;
+    word-wrap: break-word;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    animation: fadeIn 0.3s ease-out;
+  }
+  .user-bubble {
+    background-color: #3b82f6; 
+    color: white;
+    margin-left: auto;
+    border-top-right-radius: 4px;
+  }
+  .ai-bubble {
+    background-color: var(--card-bg-light); 
+    color: var(--text-color-light); 
+    margin-right: auto;
+    border-top-left-radius: 4px;
+  }
 
-        .search-input::placeholder {
-            color: #a0aec0;
-        }
+  /* Code Block Styling */
+  .ai-bubble pre {
+    background-color: #1f2937; 
+    color: #e5e7eb;
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-top: 8px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  .ai-bubble code {
+    white-space: pre; /* Pre-wrap'ı koru */
+  }
 
-        .search-input:focus {
-            border-color: #66e0ff;
-            box-shadow: 0 0 0 3px rgba(102, 224, 255, 0.5);
-        }
+  /* Sidebar transition */
+  #chatListSidebar {
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(-100%);
+  }
+  #chatListSidebar.open {
+    transform: translateX(0);
+  }
+  
+  /* Drag Over Styling */
+  .drag-over {
+      border: 3px dashed #3b82f6 !important;
+      background-color: rgba(59, 130, 246, 0.1) !important;
+  }
 
-        .search-button {
-            background-color: #6366f1; /* Mor buton */
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 9999px; /* Fully rounded */
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        }
+  /* Loading Spinner */
+  .loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 
-        .search-button:hover {
-            background-color: #4f46e5; /* Hover'da daha koyu mor */
-            transform: translateY(-2px);
-        }
-
-        .search-button:active {
-            transform: translateY(0);
-            box-shadow: none;
-        }
-
-
-        /* General container for clocks */
-        .clocks-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Responsive grid structure, smaller initial size */
-            gap: 1.5rem; /* Gap between clocks */
-            max-width: 1400px;
-            width: 100%;
-            justify-content: center;
-            align-items: start;
-        }
-
-        /* Container for each clock card */
-        .clock-container {
-            background-color: #2d3748; /* Dark gray card background */
-            border-radius: 1.5rem; /* Rounded corners */
-            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.4); /* Deep shadow */
-            padding: 1.5rem; /* Inner padding */
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem; /* Gap between elements */
-            cursor: pointer; /* Indicates it's clickable */
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, opacity 0.3s ease; /* Smooth transitions */
-            position: relative; /* For z-index */
-            z-index: 1; /* Default z-index */
-        }
-
-        .clock-container:hover {
-            transform: translateY(-5px); /* Hover effect */
-            box-shadow: 0 15px 30px -8px rgba(0, 0, 0, 0.6);
-        }
-
-        /* City name style */
-        .city-name {
-            font-size: 1.5rem; /* Smaller city name font size */
-            font-weight: 700;
-            color: #a0aec0; /* Light gray */
-            margin-bottom: 0.5rem;
-        }
-
-        /* Digital clock style */
-        .digital-clock {
-            font-family: 'Orbitron', sans-serif; /* Special font for digital clock */
-            font-size: 2.2rem; /* Smaller font size */
-            font-weight: 700;
-            color: #66e0ff; /* Bright blue */
-            text-shadow: 0 0 8px rgba(102, 224, 255, 0.4), 0 0 12px rgba(102, 224, 255, 0.2); /* Neon effect */
-            letter-spacing: 0.05em; /* Letter spacing */
-            padding: 0.3rem 0;
-            border-bottom: 1px solid #4a5568; /* Bottom border */
-            width: 100%;
-        }
-
-        /* Analog clock container */
-        .analog-clock-wrapper {
-            position: relative;
-            width: 180px; /* Clock width, smaller */
-            height: 180px; /* Clock height, smaller */
-            border-radius: 50%; /* Circular shape */
-            background-color: #f0f4f8; /* Light clock face color */
-            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1), 0 0 15px rgba(0, 0, 0, 0.3); /* Inner and outer shadow */
-            border: 5px solid #4a5568; /* Thick outer border */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Clock center point */
-        .analog-clock-wrapper::before {
-            content: '';
-            position: absolute;
-            width: 12px; /* Smaller center point */
-            height: 12px;
-            background-color: #1a202c; /* Center point color */
-            border-radius: 50%;
-            z-index: 10;
-            box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
-        }
-
-        /* Base style for clock hands */
-        .hand {
-            position: absolute;
-            transform-origin: bottom center; /* Hands rotate from their bottom center */
-            border-radius: 3px; /* Thinner hands */
-            z-index: 5;
-        }
-
-        /* Hour hand */
-        .hour-hand {
-            width: 5px;
-            height: 50px; /* Shorter hand */
-            background-color: #333;
-            top: calc(50% - 50px);
-            left: calc(50% - 2.5px);
-        }
-
-        /* Minute hand */
-        .minute-hand {
-            width: 3px;
-            height: 75px;
-            background-color: #555;
-            top: calc(50% - 75px);
-            left: calc(50% - 1.5px);
-        }
-
-        /* Second hand */
-        .second-hand {
-            width: 1px;
-            height: 85px;
-            background-color: #ef4444; /* Red second hand */
-            top: calc(50% - 85px);
-            left: calc(50% - 0.5px);
-            z-index: 6;
-        }
-
-        /* Number markers */
-        .number {
-            position: absolute;
-            font-size: 0.9rem; /* Smaller numbers */
-            font-weight: 600;
-            color: #4a5568;
-            transform: translate(-50%, -50%);
-        }
-
-        /* Active (enlarged) clock style */
-        .clock-container.active {
-            position: fixed; /* Fixes it to the center of the screen */
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(1.2); /* Enlargement scale reduced to 1.2 */
-            z-index: 100; /* Appears above everything else */
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.7); /* More prominent shadow */
-            padding: 3rem; /* More padding */
-            width: auto; /* Width based on content */
-            max-width: 500px; /* Maximum width */
-        }
-
-        .clock-container.active .city-name {
-            font-size: 2.5rem; /* Font size when enlarged */
-        }
-        .clock-container.active .digital-clock {
-            font-size: 4rem; /* Font size when enlarged */
-        }
-        .clock-container.active .analog-clock-wrapper {
-            width: 300px; /* Analog clock size when enlarged */
-            height: 300px;
-            border-width: 8px;
-        }
-        .clock-container.active .analog-clock-wrapper::before {
-            width: 20px;
-            height: 20px;
-        }
-        .clock-container.active .hour-hand {
-            width: 8px;
-            height: 80px;
-            top: calc(50% - 80px);
-            left: calc(50% - 4px);
-        }
-        .clock-container.active .minute-hand {
-            width: 6px;
-            height: 110px;
-            top: calc(50% - 110px);
-            left: calc(50% - 3px);
-        }
-        .clock-container.active .second-hand {
-            width: 2px;
-            height: 120px;
-            top: calc(50% - 120px);
-            left: calc(50% - 1px);
-        }
-        .clock-container.active .number {
-            font-size: 1.2rem;
-        }
-
-        /* Background overlay layer */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
-            z-index: 99; /* Below enlarged clock, above others */
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Media queries: Mobile responsiveness */
-        @media (max-width: 768px) {
-            .main-title {
-                font-size: 2.5rem;
-                margin-bottom: 1.5rem;
-            }
-            .search-area {
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-            .search-input, .search-button {
-                width: 100%;
-            }
-            .clocks-grid {
-                grid-template-columns: 1fr; /* Single column for mobile */
-                gap: 1.5rem;
-            }
-            .clock-container {
-                padding: 1rem;
-                border-radius: 1rem;
-            }
-            .city-name {
-                font-size: 1.2rem;
-            }
-            .digital-clock {
-                font-size: 1.8rem;
-            }
-            .analog-clock-wrapper {
-                width: 150px;
-                height: 150px;
-                border-width: 4px;
-            }
-            .analog-clock-wrapper::before {
-                width: 10px;
-                height: 10px;
-            }
-            .hour-hand {
-                width: 4px;
-                height: 40px;
-                top: calc(50% - 40px);
-                left: calc(50% - 2px);
-            }
-            .minute-hand {
-                width: 2.5px;
-                height: 60px;
-                top: calc(50% - 60px);
-                left: calc(50% - 1.25px);
-            }
-            .second-hand {
-                width: 1px;
-                height: 70px;
-                top: calc(50% - 70px);
-                left: calc(50% - 0.5px);
-            }
-            .number {
-                font-size: 0.8rem;
-            }
-
-            /* Active (enlarged) clock mobile style */
-            .clock-container.active {
-                transform: translate(-50%, -50%) scale(1.1); /* Slightly less enlargement for mobile */
-                padding: 2rem;
-                max-width: 90%; /* Prevent exceeding mobile screen */
-            }
-            .clock-container.active .city-name {
-                font-size: 2rem;
-            }
-            .clock-container.active .digital-clock {
-                font-size: 3rem;
-            }
-            .clock-container.active .analog-clock-wrapper {
-                width: 250px;
-                height: 250px;
-                border-width: 6px;
-            }
-            .clock-container.active .analog-clock-wrapper::before {
-                width: 16px;
-                height: 16px;
-            }
-            .clock-container.active .hour-hand {
-                width: 6px;
-                height: 65px;
-                top: calc(50% - 65px);
-                left: calc(50% - 3px);
-            }
-            .clock-container.active .minute-hand {
-                width: 4px;
-                height: 95px;
-                top: calc(50% - 95px);
-                left: calc(50% - 2px);
-            }
-            .clock-container.active .second-hand {
-                width: 1.5px;
-                height: 105px;
-                top: calc(50% - 105px);
-                left: calc(50% - 0.75px);
-            }
-            .clock-container.active .number {
-                font-size: 1.1rem;
-            }
-        }
-    </style>
+  /* Aesthetic Settings Modal - Lucide/Custom Icons */
+  .icon-style {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  
+  /* AI Tools Menu Toggle */
+  #aiToolsMenu {
+      transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+      transform-origin: bottom left;
+      opacity: 0;
+      transform: scale(0.9);
+      pointer-events: none;
+  }
+  #aiToolsMenu.open {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+  }
+  
+  /* Custom scrollbar for menu */
+  .scrollable-menu::-webkit-scrollbar { width: 4px; }
+  .scrollable-menu::-webkit-scrollbar-thumb { background-color: #a7a7a7; border-radius: 2px; }
+  .scrollable-menu::-webkit-scrollbar-track { background-color: transparent; }
+</style>
 </head>
-<body class="antialiased">
-    <h1 class="main-title">Dünya Saatleri</h1>
+<body class="flex flex-col h-screen">
 
-    <!-- Arama Alanı Eklendi -->
-    <div class="search-area">
-        <input type="text" id="searchInput" placeholder="Şehir veya ülke ara..." class="search-input">
-        <button id="searchButton" class="search-button">Ara</button>
+<!-- Sidebar for Chat History -->
+<div id="chatListSidebar" class="fixed top-0 left-0 h-full w-64 shadow-xl z-50 flex flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+    <div class="p-4 flex justify-between items-center border-b dark:border-gray-700">
+        <h2 class="text-xl font-bold text-blue-600">Sohbet Geçmişi</h2>
+        <button id="closeSidebarBtn" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white text-2xl leading-none">&times;</button>
+    </div>
+    
+    <div class="p-4">
+        <button id="newChatBtn" class="w-full bg-green-500 text-white px-4 py-2 rounded-xl font-semibold shadow-md hover:bg-green-600 transition duration-150 text-sm mb-4">
+            + Yeni Sohbet Başlat
+        </button>
     </div>
 
-    <div class="clocks-grid">
-        <!-- Her bir saat dinamik olarak buraya eklenecek -->
+    <div id="conversationsList" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
+        <p id="noChatsMsg" class="text-sm text-gray-500 text-center dark:text-gray-400">Henüz sohbet yok.</p>
     </div>
+</div>
 
-    <!-- Arka plan karartma katmanı -->
-    <div class="overlay" id="overlay"></div>
+<!-- Header -->
+<div class="header bg-white shadow-lg p-4 flex justify-between items-center z-20 dark:bg-gray-800">
+    <div class="flex items-center">
+        <!-- Sidebar Toggle Icon (Hamburger) -->
+        <button id="toggleSidebarBtn" class="text-2xl text-gray-700 mr-4 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 leading-none">&#x2261;</button>
+        <h1 class="text-3xl font-bold text-blue-600">MuAi</h1>
+    </div>
+    
+    <div class="flex gap-2">
+        <button id="settingsBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl font-semibold shadow-md hover:bg-gray-300 transition duration-150 text-sm dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+            Ayarlar
+        </button>
+    </div>
+</div>
 
-    <script>
-        // Saat verilerini tutacak dizi
-        const clocksData = [
-            { id: 'baku', name: 'Bakü, Azerbaycan', timeZone: 'Asia/Baku' },
-            { id: 'istanbul', name: 'İstanbul, Türkiye', timeZone: 'Europe/Istanbul' },
-            { id: 'karachi', name: 'Karaçi, Pakistan', timeZone: 'Asia/Karachi' },
-            { id: 'new-york', name: 'New York, ABD', timeZone: 'America/New_York' },
-            { id: 'berlin', name: 'Berlin, Almanya', timeZone: 'Europe/Berlin' },
-            { id: 'tokyo', name: 'Tokyo, Japonya', timeZone: 'Asia/Tokyo' },
-            { id: 'sydney', name: 'Sydney, Avustralya', timeZone: 'Australia/Sydney' },
-            { id: 'london', name: 'Londra, İngiltere', timeZone: 'Europe/London' },
-            { id: 'dubai', name: 'Dubai, BAE', timeZone: 'Asia/Dubai' },
-            { id: 'paris', name: 'Paris, Fransa', timeZone: 'Europe/Paris' },
-            { id: 'rome', name: 'Roma, İtalya', timeZone: 'Europe/Rome' },
-            { id: 'madrid', name: 'Madrid, İspanya', timeZone: 'Europe/Madrid' },
-            { id: 'amsterdam', name: 'Amsterdam, Hollanda', timeZone: 'Europe/Amsterdam' },
-            { id: 'warsaw', name: 'Varşova, Polonya', timeZone: 'Europe/Warsaw' },
-            { id: 'moscow', name: 'Moskova, Rusya', timeZone: 'Europe/Moscow' },
-            { id: 'stockholm', name: 'Stockholm, İsveç', timeZone: 'Europe/Stockholm' },
-            { id: 'oslo', name: 'Oslo, Norveç', timeZone: 'Europe/Oslo' },
-            { id: 'zurich', name: 'Zürih, İsviçre', timeZone: 'Europe/Zurich' },
-            { id: 'toronto', name: 'Toronto, Kanada', timeZone: 'America/Toronto' },
-            { id: 'mexico-city', name: 'Meksiko, Meksika', timeZone: 'America/Mexico_City' },
-            { id: 'sao-paulo', name: 'Sao Paulo, Brezilya', timeZone: 'America/Sao_Paulo' },
-            { id: 'buenos-aires', name: 'Buenos Aires, Arjantin', timeZone: 'America/Argentina/Buenos_Aires' },
-            { id: 'santiago', name: 'Santiago, Şili', timeZone: 'America/Santiago' },
-            { id: 'bogota', name: 'Bogota, Kolombiya', timeZone: 'America/Bogota' },
-            { id: 'shanghai', name: 'Şanghay, Çin', timeZone: 'Asia/Shanghai' },
-            { id: 'kolkata', name: 'Kalküta, Hindistan', timeZone: 'Asia/Kolkata' },
-            { id: 'seoul', name: 'Seul, Güney Kore', timeZone: 'Asia/Seoul' },
-            { id: 'jakarta', name: 'Cakarta, Endonezya', timeZone: 'Asia/Jakarta' },
-            { id: 'riyadh', name: 'Riyad, Suudi Arabistan', timeZone: 'Asia/Riyadh' },
-            { id: 'johannesburg', name: 'Johannesburg, Güney Afrika', timeZone: 'Africa/Johannesburg' },
-            { id: 'lagos', name: 'Lagos, Nijerya', timeZone: 'Africa/Lagos' },
-            { id: 'cairo', name: 'Kahire, Mısır', timeZone: 'Africa/Cairo' },
-            { id: 'nairobi', name: 'Nairobi, Kenya', timeZone: 'Africa/Nairobi' },
-            { id: 'casablanca', name: 'Kazablanka, Fas', timeZone: 'Africa/Casablanca' },
-            { id: 'brussels', name: 'Brüksel, Belçika', timeZone: 'Europe/Brussels' },
-            { id: 'vienna', name: 'Viyana, Avusturya', timeZone: 'Europe/Vienna' },
-            { id: 'copenhagen', name: 'Kopenhag, Danimarka', timeZone: 'Europe/Copenhagen' },
-            { id: 'helsinki', name: 'Helsinki, Finlandiya', timeZone: 'Europe/Helsinki' },
-            { id: 'athens', name: 'Atina, Yunanistan', timeZone: 'Europe/Athens' },
-            { id: 'prague', name: 'Prag, Çekya', timeZone: 'Europe/Prague' },
-            { id: 'budapest', name: 'Budapeşte, Macaristan', timeZone: 'Europe/Budapest' },
-            { id: 'dublin', name: 'Dublin, İrlanda', timeZone: 'Europe/Dublin' },
-            { id: 'lisbon', name: 'Lizbon, Portekiz', timeZone: 'Europe/Lisbon' },
-            { id: 'sofia', name: 'Sofya, Bulgaristan', timeZone: 'Europe/Sofia' },
-            { id: 'bucharest', name: 'Bükreş, Romanya', timeZone: 'Europe/Bucharest' },
-            { id: 'bangkok', name: 'Bangkok, Tayland', timeZone: 'Asia/Bangkok' },
-            { id: 'ho-chi-minh', name: 'Ho Chi Minh, Vietnam', timeZone: 'Asia/Ho_Chi_Minh' },
-            { id: 'doha', name: 'Doha, Katar', timeZone: 'Asia/Qatar' },
-            { id: 'tehran', name: 'Tahran, İran', timeZone: 'Asia/Tehran' }
-        ];
+<!-- Chat Area -->
+<div id="chatArea" class="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
+    <div id="initialStateMsg" class="text-center text-gray-500 mt-12 dark:text-gray-400">
+        <p class="text-xl font-semibold mb-2">Hoş Geldiniz!</p>
+        <p>Sol üstteki menüden eski sohbetlerinize ulaşabilir veya yeni bir sohbet başlatabilirsiniz.</p>
+        <p class="mt-4 text-blue-500">İlk mesajınızı gönderin, bir resim sürükleyip bırakın veya alt kısımdaki AI menüsünü kullanın.</p>
+    </div>
+</div>
 
-        const clocksGrid = document.querySelector('.clocks-grid');
-        const overlay = document.getElementById('overlay');
-        let activeClock = null; // Aktif (büyütülmüş) saati takip etmek için
+<!-- Input Area -->
+<div class="input-area p-4 bg-white border-t border-gray-200 shadow-inner sticky bottom-0 z-10 dark:bg-gray-800 dark:border-gray-700">
+    <div class="flex flex-col gap-3">
 
-        // Arama alanı ve butonu
-        const searchInput = document.getElementById('searchInput');
-        const searchButton = document.getElementById('searchButton');
+        <!-- Image Input Preview -->
+        <div id="imagePreviewContainer" class="hidden relative p-2 border border-dashed border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+            <img id="imagePreview" class="max-h-24 w-auto rounded-md object-cover" src="" alt="Image Preview" />
+            <button id="clearImageBtn" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 leading-none text-xs w-5 h-5 flex items-center justify-center font-bold transition hover:bg-red-700">&times;</button>
+        </div>
 
-        // Her bir saat için HTML yapısını oluşturan fonksiyon
-        function createClockHTML(clockInfo) {
-            const clockContainer = document.createElement('div');
-            clockContainer.classList.add('clock-container');
-            clockContainer.id = `clock-container-${clockInfo.id}`; // ID ekle
-            clockContainer.innerHTML = `
-                <div class="city-name">${clockInfo.name}</div>
-                <div id="digital-clock-${clockInfo.id}" class="digital-clock">00:00:00</div>
-                <div class="analog-clock-wrapper">
-                    <div class="hand hour-hand" id="hour-hand-${clockInfo.id}"></div>
-                    <div class="hand minute-hand" id="minute-hand-${clockInfo.id}"></div>
-                    <div class="hand second-hand" id="second-hand-${clockInfo.id}"></div>
-                    <!-- Saat sayıları (12, 3, 6, 9) -->
-                    <div class="number" style="top: 15%; left: 50%;">12</div>
-                    <div class="number" style="top: 50%; right: 15%;">3</div>
-                    <div class="number" style="bottom: 15%; left: 50%;">6</div>
-                    <div class="number" style="top: 50%; left: 15%;">9</div>
-                </div>
-            `;
-            clocksGrid.appendChild(clockContainer);
+        <input type="file" id="imageInput" accept="image/*" class="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-800 dark:file:text-blue-100 dark:hover:file:bg-blue-700" />
+        
+        <!-- Reply Suggestions Container -->
+        <div id="replySuggestionsContainer" class="hidden flex flex-wrap gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+            <!-- Suggestions will go here -->
+        </div>
 
-            // Tıklama olay dinleyicisi ekle
-            clockContainer.addEventListener('click', () => toggleClockEnlargement(clockContainer));
+        <div class="flex gap-2 relative">
+            <!-- AI Tools Menu Button -->
+            <button id="aiMenuToggle" class="relative bg-gray-200 text-gray-700 w-12 h-12 flex items-center justify-center rounded-xl shadow-md hover:bg-gray-300 transition duration-150 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600" title="AI Araçları">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            </button>
+            
+            <!-- AI Tools Dropdown Menu -->
+            <div id="aiToolsMenu" class="absolute bottom-full left-0 mb-2 w-52 bg-white rounded-xl shadow-2xl p-2 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 z-30">
+                <button id="summarizeBtn" data-tool="summarize" class="ai-tool-btn w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm text-purple-700 hover:bg-purple-50 dark:text-purple-300 dark:hover:bg-purple-900 transition duration-150 disabled:opacity-50" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="M15 4.7l-1.7 1.7"/><path d="M17 9h-2"/><path d="M14.7 12.3l1.7 1.7"/><path d="M12 15v-2"/><path d="M9.3 12.3l-1.7 1.7"/><path d="M7 9H9"/><path d="M9.3 4.7l-1.7 1.7"/><circle cx="12" cy="12" r="10"/><path d="M12 21v-2"/></svg>
+                    Metni Özetle
+                </button>
+                <button id="continueTextBtn" data-tool="continueText" class="ai-tool-btn w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm text-teal-700 hover:bg-teal-50 dark:text-teal-300 dark:hover:bg-teal-900 transition duration-150 disabled:opacity-50" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M3 10h10"/><path d="M11 6h10"/><path d="M12 14h9"/><path d="M3 18h5"/><path d="M3 6h5"/></svg>
+                    Devamını Yaz
+                </button>
+                <button id="generateCodeBtn" data-tool="generateCode" class="ai-tool-btn w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm text-orange-700 hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-orange-900 transition duration-150 disabled:opacity-50" disabled>
+                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
+                    Kod Oluştur
+                </button>
+                <button id="suggestReplyBtn" data-tool="suggestReply" class="ai-tool-btn w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm text-indigo-700 hover:bg-indigo-50 dark:text-indigo-300 dark:hover:bg-indigo-900 transition duration-150 disabled:opacity-50" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 9 12 4 17 9"/><line x1="12" y1="4" x2="12" y2="16"/></svg>
+                    Yanıt Öner
+                </button>
+            </div>
+            
+            <input id="messageInput" type="text" placeholder="Bir mesaj yazın veya bir fotoğraf sürükleyip bırakın..." class="flex-1 border border-gray-300 p-3 rounded-xl focus:ring-blue-500 focus:border-blue-500 transition duration-150 shadow-md dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
+            <button id="sendBtn" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:bg-blue-700 transition duration-150 disabled:bg-blue-300 disabled:shadow-none dark:disabled:bg-blue-800" disabled>
+                Gönder
+            </button>
+        </div>
+        <div id="statusMessage" class="text-center text-sm text-red-500 hidden"></div>
+    </div>
+</div>
+
+<!-- Aesthetic Settings Modal -->
+<div id="settingsModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all dark:bg-gray-800 border-t-4 border-blue-500">
+        <h2 class="text-2xl font-extrabold mb-6 text-gray-900 dark:text-white flex items-center">
+            <svg class="icon-style w-6 h-6 mr-3 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><path d="M12 10v4"/></svg>
+            Uygulama Ayarları
+        </h2>
+        
+        <!-- Tema Seçeneği -->
+        <div class="flex items-center justify-between mb-4 p-4 rounded-xl transition duration-200 bg-gray-50 dark:bg-gray-700 shadow-sm border border-gray-100 dark:border-gray-700">
+            <label for="themeToggleModal" class="text-sm font-medium text-gray-700 select-none dark:text-gray-200 flex items-center">
+                <svg class="icon-style mr-3 text-yellow-500 dark:text-blue-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>
+                Gece Modu
+            </label>
+            <input type="checkbox" id="themeToggleModal" class="appearance-none h-6 w-11 bg-gray-300 rounded-full checked:bg-blue-500 transition duration-300 ease-in-out relative cursor-pointer" style="margin-right: -4px;">
+        </div>
+
+        <!-- Dil Seçeneği -->
+        <div class="mb-4 p-4 rounded-xl transition duration-200 bg-gray-50 dark:bg-gray-700 shadow-sm border border-gray-100 dark:border-gray-700">
+            <label for="langSelectModal" class="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-200 flex items-center">
+                <svg class="icon-style mr-3 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 8h4"/><path d="M10 12l.96-2.93a3.52 3.52 0 0 1 5.08-1.55L19 9"/><path d="M22 10.66V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8"/><path d="M15 15h6"/></svg>
+                AI Yanıt Dili
+            </label>
+            <select id="langSelectModal" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500">
+                <option value="tr-TR">Türkçe (Turkish)</option>
+                <option value="en-US">English (İngilizce)</option>
+                <option value="de-DE">Deutsch (Almanca)</option>
+                <option value="az-AZ">Azərbaycanca (Azerbaijani)</option>
+                <option value="fr-FR">Français (Fransızca)</option>
+                <option value="es-ES">Español (İspanyolca)</option>
+                <option value="ru-RU">Русский (Rusça)</option>
+                <option value="ja-JP">日本語 (Japonca)</option>
+                <option value="ar-EG">العربية (Arapça)</option>
+            </select>
+        </div>
+
+        <!-- Seslendirme Ayarları -->
+        <div class="p-4 rounded-xl transition duration-200 bg-gray-50 dark:bg-gray-700 shadow-sm border border-gray-100 dark:border-gray-700 mb-6">
+            <div class="flex items-center justify-between mb-3">
+                <label for="ttsToggleModal" class="text-sm font-medium text-gray-700 select-none dark:text-gray-200 flex items-center">
+                    <svg class="icon-style mr-3 text-purple-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 13.56a2 2 0 1 0 0-3.12 2 2 0 0 0 0 3.12z"/></svg>
+                    Yanıtları Sesli Oku
+                </label>
+                <input type="checkbox" id="ttsToggleModal" class="appearance-none h-6 w-11 bg-gray-300 rounded-full checked:bg-blue-500 transition duration-300 ease-in-out relative cursor-pointer" style="margin-right: -4px;">
+            </div>
+
+            <div class="mt-4">
+                <label for="voiceSelectModal" class="block text-xs font-medium text-gray-500 mb-1 dark:text-gray-400">Ses Seçimi</label>
+                <select id="voiceSelectModal" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500">
+                    <option value="Kore">Ses 1 (Kore - Firm)</option>
+                    <option value="Puck">Ses 2 (Puck - Upbeat)</option>
+                    <option value="Zephyr">Ses 3 (Zephyr - Bright)</option>
+                </select>
+            </div>
+        </div>
+
+        <button id="closeSettingsBtn" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg shadow-blue-500/50 hover:from-blue-600 hover:to-indigo-700 transition duration-150">
+            Kapat ve Kaydet
+        </button>
+    </div>
+</div>
+
+<script>
+// --- GLOBAL CONFIGURATION ---
+const GEMINI_API_KEY = "";
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=";
+const TTS_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=";
+
+// --- STATE MANAGEMENT (LOCAL STORAGE) ---
+let messages = []; // Aktif sohbetin mesajları
+let conversations = []; // {id: string, title: string, messages: [], updatedAt: number}
+let currentChatId = null;
+let audioContext = null;
+let abortController = null; // API durdurma/iptal kontrolörü
+
+// Local Settings State (Initial load)
+let settings = JSON.parse(localStorage.getItem('muai_settings')) || {
+    lang: "tr-TR", 
+    voice: "Kore", 
+    ttsEnabled: false, 
+    theme: "light"
+};
+
+// --- DOM ELEMENTS ---
+const chatArea = document.getElementById('chatArea');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+const imageInput = document.getElementById('imageInput');
+const imagePreview = document.getElementById('imagePreview');
+const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+const clearImageBtn = document.getElementById('clearImageBtn');
+const statusMessage = document.getElementById('statusMessage');
+const initialStateMsg = document.getElementById('initialStateMsg');
+
+// New AI Features
+const aiMenuToggle = document.getElementById('aiMenuToggle');
+const aiToolsMenu = document.getElementById('aiToolsMenu');
+const summarizeBtn = document.getElementById('summarizeBtn');
+const continueTextBtn = document.getElementById('continueTextBtn');
+const generateCodeBtn = document.getElementById('generateCodeBtn'); // New button
+const suggestReplyBtn = document.getElementById('suggestReplyBtn');
+const replySuggestionsContainer = document.getElementById('replySuggestionsContainer');
+
+// Sidebar/Settings UI
+const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
+const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+const chatListSidebar = document.getElementById('chatListSidebar');
+const newChatBtn = document.getElementById('newChatBtn');
+const conversationsListEl = document.getElementById('conversationsList');
+const noChatsMsg = document.getElementById('noChatsMsg');
+
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsModal = document.getElementById('settingsModal');
+const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+const langSelectModal = document.getElementById('langSelectModal');
+const voiceSelectModal = document.getElementById('voiceSelectModal');
+const ttsToggleModal = document.getElementById('ttsToggleModal');
+const themeToggleModal = document.getElementById('themeToggleModal');
+
+
+// --- LOCAL STORAGE FUNCTIONS ---
+
+function loadStateFromLocalStorage() {
+    // 1. Load Settings (Already done globally)
+    
+    // 2. Load Conversations
+    const storedConversations = localStorage.getItem('muai_conversations');
+    if (storedConversations) {
+        conversations = JSON.parse(storedConversations);
+        conversations.sort((a, b) => b.updatedAt - a.updatedAt);
+    }
+
+    // 3. Load Active Chat
+    const activeChatId = localStorage.getItem('muai_active_chat_id');
+    if (activeChatId) {
+        currentChatId = activeChatId;
+        const activeChat = conversations.find(c => c.id === currentChatId);
+        if (activeChat) {
+            messages = activeChat.messages;
+        } else {
+            handleNewChat(false); 
         }
+    } else if (conversations.length > 0) {
+        currentChatId = conversations[0].id;
+        messages = conversations[0].messages;
+        localStorage.setItem('muai_active_chat_id', currentChatId);
+    } else {
+        handleNewChat(false);
+    }
+}
 
-        // Tüm saatler için HTML yapısını oluştur
-        function renderClocks(filteredClocks) {
-            clocksGrid.innerHTML = ''; // Mevcut saatleri temizle
-            filteredClocks.forEach(clock => {
-                createClockHTML(clock);
-            });
-            // Saatleri tekrar güncelleyelim, çünkü DOM değişti
-            clocksData.forEach(clock => updateClock(clock));
-        }
+function saveStateToLocalStorage(saveSettingsFlag = true) {
+    if (saveSettingsFlag) {
+        localStorage.setItem('muai_settings', JSON.stringify(settings));
+    }
+    
+    const activeChatIndex = conversations.findIndex(c => c.id === currentChatId);
+    const now = Date.now();
+    
+    // Başlık oluşturma
+    const newTitle = messages.length > 0 ? messages[0].text.substring(0, 50).replace(/(\r\n|\n|\r)/gm, " ").trim() + (messages[0].text.length > 50 ? '...' : '') : "Yeni Sohbet";
+    if (newTitle === "Görsel gönderildi.") {
+        const firstText = messages.find(m => m.text && m.text !== 'Görsel gönderildi.')?.text || "Yeni Sohbet";
+        conversations[activeChatIndex].title = firstText.substring(0, 50).trim() + (firstText.length > 50 ? '...' : '');
+    }
 
-        // Başlangıçta tüm saatleri göster
-        renderClocks(clocksData);
-
-        // Belirli bir saat dilimi için saati güncelleyen fonksiyon
-        function updateClock(clockInfo) {
-            const now = new Date(); // Şu anki yerel zaman
-
-            // Belirli bir zaman dilimine göre zamanı al
-            const options = {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false, // 24-hour format
-                timeZone: clockInfo.timeZone
-            };
-            const timeString = now.toLocaleString('en-US', options); // Formatlanmış zaman stringi
-
-            // Dijital saat elementini bul ve güncelle
-            const digitalClockElement = document.getElementById(`digital-clock-${clockInfo.id}`);
-            if (digitalClockElement) {
-                digitalClockElement.textContent = timeString;
-            }
-
-            // Analog saat ibrelerini bul
-            const hourHandElement = document.getElementById(`hour-hand-${clockInfo.id}`);
-            const minuteHandElement = document.getElementById(`minute-hand-${clockInfo.id}`);
-            const secondHandElement = document.getElementById(`second-hand-${clockInfo.id}`);
-
-            if (hourHandElement && minuteHandElement && secondHandElement) {
-                // Zaman dilimine göre saat, dakika, saniye değerlerini al
-                const currentHours = parseInt(now.toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: clockInfo.timeZone }));
-                const currentMinutes = parseInt(now.toLocaleString('en-US', { minute: 'numeric', timeZone: clockInfo.timeZone }));
-                const currentSeconds = parseInt(now.toLocaleString('en-US', { second: 'numeric', timeZone: clockInfo.timeZone }));
-
-                // İbrelerin açılarını hesapla
-                const secondDegrees = (currentSeconds * 6) + 90;
-                const minuteDegrees = (currentMinutes * 6) + (currentSeconds * 0.1) + 90;
-                const hourDegrees = (currentHours % 12 * 30) + (currentMinutes * 0.5) + 90;
-
-                secondHandElement.style.transform = `rotate(${secondDegrees}deg)`;
-                minuteHandElement.style.transform = `rotate(${minuteDegrees}deg)`;
-                hourHandElement.style.transform = `rotate(${hourDegrees}deg)`;
-            }
-        }
-
-        // Saati büyütme/küçültme işlevi
-        function toggleClockEnlargement(clickedClock) {
-            // Eğer aktif bir saat varsa ve tıklanan saat o değilse, aktif saati küçült
-            if (activeClock && activeClock !== clickedClock) {
-                activeClock.classList.remove('active');
-            }
-
-            // Tıklanan saati büyüt/küçült
-            clickedClock.classList.toggle('active');
-
-            if (clickedClock.classList.contains('active')) {
-                activeClock = clickedClock;
-                overlay.classList.add('show'); // Arka planı karart
-                // Aktif olmayan saatleri hafifçe soluklaştır ve tıklanamaz yap
-                document.querySelectorAll('.clock-container:not(.active)').forEach(clock => {
-                    clock.style.opacity = '0.3';
-                    clock.style.pointerEvents = 'none';
-                });
-            } else {
-                activeClock = null;
-                overlay.classList.remove('show'); // Arka planı eski haline getir
-                // Tüm saatleri görünür yap ve tıklanabilir hale getir
-                document.querySelectorAll('.clock-container').forEach(clock => {
-                    clock.style.opacity = '1';
-                    clock.style.pointerEvents = 'auto';
-                });
-            }
-        }
-
-        // Arka plana tıklayınca aktif saati kapat
-        overlay.addEventListener('click', () => {
-            if (activeClock) {
-                toggleClockEnlargement(activeClock); // Aktif saati kapat
-            }
-        });
-
-        // Arama fonksiyonu
-        function performSearch() {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            let filteredClocks = [];
-
-            if (searchTerm === '') {
-                filteredClocks = clocksData; // Arama boşsa tüm saatleri göster
-            } else {
-                // Şehir veya ülke adına göre filtrele
-                filteredClocks = clocksData.filter(clock =>
-                    clock.name.toLowerCase().includes(searchTerm)
-                );
-            }
-            renderClocks(filteredClocks); // Filtrelenmiş saatleri yeniden render et
-
-            // Eğer büyütülmüş bir saat varsa ve arama sonucu o saati gizlediyse, küçült
-            if (activeClock && !filteredClocks.some(clock => `clock-container-${clock.id}` === activeClock.id)) {
-                toggleClockEnlargement(activeClock);
-            }
-        }
-
-        // Arama butonu olay dinleyicisi
-        searchButton.addEventListener('click', performSearch);
-
-        // Arama inputunda Enter tuşuna basıldığında
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                performSearch();
-            }
-        });
-
-        // Arama inputu boşaldığında tüm saatleri tekrar göstermek için
-        searchInput.addEventListener('input', () => {
-            if (searchInput.value.trim() === '') {
-                performSearch();
-            }
-        });
-
-        // Sayfa yüklendiğinde ve her saniye tüm saatleri güncelle
-        window.onload = function() {
-            // İlk yüklemede tüm saatleri ayarla
-            clocksData.forEach(clock => updateClock(clock));
-
-            // Her saniye tüm saatleri güncelle
-            setInterval(() => {
-                clocksData.forEach(clock => updateClock(clock));
-            }, 1000);
+    if (activeChatIndex !== -1) {
+        conversations[activeChatIndex].messages = messages;
+        conversations[activeChatIndex].updatedAt = now;
+        conversations[activeChatIndex].title = newTitle;
+    } else if (messages.length > 0) {
+        const newId = currentChatId || crypto.randomUUID(); 
+        const newChat = {
+            id: newId,
+            title: newTitle,
+            messages: messages,
+            updatedAt: now
         };
-    </script>
+        conversations.unshift(newChat); 
+        currentChatId = newId;
+        localStorage.setItem('muai_active_chat_id', currentChatId);
+    }
+    
+    conversations.sort((a, b) => b.updatedAt - a.updatedAt);
+    localStorage.setItem('muai_conversations', JSON.stringify(conversations));
+}
+
+// --- UTILITY FUNCTIONS (Audio, Base64, Fetch) ---
+
+/** Converts ArrayBuffer (PCM data) to WAV Blob. */
+function pcmToWav(pcm16, sampleRate) {
+    const buffer = new ArrayBuffer(44 + pcm16.byteLength);
+    const view = new DataView(buffer);
+    const writeString = (view, offset, string) => {
+        for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+    };
+    let offset = 0;
+    writeString(view, offset, 'RIFF'); offset += 4;
+    view.setUint32(offset, 36 + pcm16.byteLength, true); offset += 4;
+    writeString(view, offset, 'WAVE'); offset += 4;
+    view.setUint32(offset, 16, true); offset += 4;
+    view.setUint16(offset, 1, true); offset += 2;
+    view.setUint16(offset, 1, true); offset += 2;
+    view.setUint32(offset, sampleRate, true); offset += 4;
+    view.setUint32(offset, sampleRate * 2, true); offset += 4;
+    view.setUint16(offset, 2, true); offset += 2;
+    view.setUint16(offset, 16, true); offset += 2;
+    writeString(view, offset, 'data'); offset += 4;
+    view.setUint32(offset, pcm16.byteLength, true); offset += 4;
+    new Int16Array(buffer, offset).set(pcm16);
+    return new Blob([buffer], { type: 'audio/wav' });
+}
+
+/** Converts base64 to ArrayBuffer. */
+function base64ToArrayBuffer(base64) {
+    const binaryString = atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
+    return bytes.buffer;
+}
+
+/** Plays the audio from base64 PCM data. */
+async function playAudio(base64Audio, mimeType) {
+    try {
+        if (!settings.ttsEnabled) return;
+
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const rateMatch = mimeType.match(/rate=(\d+)/);
+        const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 16000;
+        const pcmData = base64ToArrayBuffer(base64Audio);
+        const pcm16 = new Int16Array(pcmData);
+        const wavBlob = pcmToWav(pcm16, sampleRate);
+        const audioUrl = URL.createObjectURL(wavBlob);
+        const audio = new Audio(audioUrl);
+        await audio.play();
+        audio.onended = () => { URL.revokeObjectURL(audioUrl); };
+    } catch (error) {
+        console.error("Audio playback error:", error);
+    }
+}
+
+/** Converts File object to base64 for API payload. */
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const dataUrl = reader.result;
+            const partsArray = dataUrl.split(',');
+            const mimeType = partsArray[0].match(/data:(.*?);/)?.[1];
+            const base64Data = partsArray[1];
+            resolve({
+                mimeType: mimeType,
+                data: base64Data,
+                dataUrl: dataUrl
+            });
+        };
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+    });
+}
+
+/** Handles API calls with exponential backoff. */
+async function fetchWithBackoff(url, options, retries = 3) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! status: ${response.status}. Details: ${errorText}`);
+            }
+            return response;
+        } catch (error) {
+            // Abort sinyali yakalandıysa, hatayı yukarı atmadan hemen çık
+            if (options.signal && options.signal.aborted) {
+                throw new Error("İşlem kullanıcı tarafından iptal edildi.");
+            }
+            
+            console.warn(`Attempt ${i + 1} failed: ${error.message}`);
+            if (i < retries - 1) {
+                const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                await new Promise(resolve => setTimeout(resolve, delay));
+            } else {
+                throw error;
+            }
+        }
+    }
+}
+
+// --- GEMINI INTEGRATION (COMMON) ---
+
+/** Converts chat history to Gemini API format. */
+function historyToContents(history, newUserMessageText, newUserMessageImage) {
+    const contents = [];
+    
+    // 1. Existing History
+    history.forEach(m => {
+        const role = m.type === 'user' ? 'user' : 'model';
+        const parts = [];
+
+        if (m.image && m.type === 'user') {
+            const partsArray = m.image.split(',');
+            const mimeType = partsArray[0].match(/data:(.*?);/)?.[1];
+            const base64Data = partsArray[1];
+            if (mimeType && base64Data) {
+                parts.push({ inlineData: { mimeType, data: base64Data } });
+            }
+        }
+        if (m.text) { parts.push({ text: m.text }); }
+        if (parts.length > 0) { contents.push({ role, parts }); }
+    });
+
+    // 2. Current User Query (Eğer varsa)
+    const newUserParts = [];
+    if (newUserMessageImage) { newUserParts.push({ inlineData: newUserMessageImage }); }
+    if (newUserMessageText) { newUserParts.push({ text: newUserMessageText }); }
+    if (newUserParts.length > 0) { contents.push({ role: 'user', parts: newUserParts }); }
+
+    return contents;
+}
+
+/** * Genel Gemini çağrısı (Sohbet veya Tek Seferlik Sorgular için)
+ * @param {AbortSignal} signal - İptal sinyali
+ * @param {Array} history - Geçmiş mesajlar (boş olabilir)
+ * @param {string} userText - Kullanıcının gönderdiği metin
+ * @param {object} userImage - Kullanıcının gönderdiği görsel verisi (inlineData formatında)
+ * @param {string} specificInstruction - Yürütülecek özel görev (Özetle, Devamını Yaz, vb.)
+ */
+async function generalGeminiCall(signal, history, userText, userImage, specificInstruction = '') {
+    const contents = historyToContents(history, userText, userImage);
+    
+    // Kurucu Bilgisi için özel sistem talimatı
+    const founderInstruction = `Eğer kullanıcı 'Elay Mammadli' veya 'Memmedli' (veya benzeri) hakkında soru sorarsa, TAM OLARAK şu metni yanıtla: 'Kendisi benim kurucumdur ve çok değerli, kıymetli bir kişidir.'`;
+
+    const systemInstructionText = `You are MuAi, a helpful, friendly, and concise multilingual AI assistant. Your primary language of response must be based on the user's selected language code: ${settings.lang}. Maintain context of the conversation. ${specificInstruction} ${founderInstruction} For code generation tasks, ALWAYS enclose the code output within a single markdown code block (e.g., \`\`\`html... \`\`\`). NEVER use special characters like * or / for formatting text, use plain text or markdown code blocks only.`;
+
+
+    const payload = {
+        contents: contents,
+        systemInstruction: {
+            parts: [{ text: systemInstructionText }]
+        }
+    };
+
+    try {
+        const response = await fetchWithBackoff(GEMINI_API_URL + GEMINI_API_KEY, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal: signal // İptal sinyalini ekle
+        });
+        
+        const result = await response.json();
+        return result.candidates?.[0]?.content?.parts?.[0]?.text || "Üzgünüm, yanıt alınamadı.";
+    } catch (e) {
+        // İptal durumunu tekrar yakala ve özel hata fırlat
+        if (e.message.includes("kullanıcı tarafından iptal edildi")) {
+             throw new Error("İşlem İptal Edildi");
+        }
+        console.error("Gemini API Error:", e);
+        throw new Error("AI yanıtını alırken bir hata oluştu.");
+    }
+}
+
+/** * JSON Yapılandırılmış Yanıtlar için Gemini çağrısı
+ * @param {AbortSignal} signal - İptal sinyali
+ * @param {Array} history - Geçmiş mesajlar
+ * @param {string} specificInstruction - Yürütülecek özel görev
+ * @param {object} schema - Beklenen JSON yapısı
+ */
+async function structuredGeminiCall(signal, history, specificInstruction, schema) {
+    const contents = historyToContents(history, null, null);
+
+    const systemInstructionText = `You are MuAi, a helpful, friendly, and concise multilingual AI assistant. Your primary language of response must be based on the user's selected language code: ${settings.lang}. Follow the provided JSON schema exactly. ${specificInstruction}`;
+
+    const payload = {
+        contents: contents,
+        systemInstruction: {
+            parts: [{ text: systemInstructionText }]
+        },
+        generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: schema
+        }
+    };
+
+    try {
+        const response = await fetchWithBackoff(GEMINI_API_URL + GEMINI_API_KEY, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal: signal // İptal sinyalini ekle
+        });
+
+        const result = await response.json();
+        const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (jsonText) {
+            return JSON.parse(jsonText);
+        }
+        throw new Error("JSON yanıtı alınamadı veya ayrıştırılamadı.");
+
+    } catch (e) {
+        if (e.message.includes("kullanıcı tarafından iptal edildi")) {
+             throw new Error("İşlem İptal Edildi");
+        }
+        console.error("Structured Gemini API Error:", e);
+        throw new Error("Yapılandırılmış AI yanıtını alırken bir hata oluştu.");
+    }
+}
+
+// --- GEMINI INTEGRATION (TTS) ---
+
+async function callTtsApi(text) {
+    const payload = {
+        contents: [{
+            parts: [{ text: text }]
+        }],
+        generationConfig: {
+            responseModalities: ["AUDIO"],
+            speechConfig: {
+                voiceConfig: {
+                    prebuiltVoiceConfig: { voiceName: settings.voice }
+                }
+            }
+        },
+        model: "gemini-2.5-flash-preview-tts"
+    };
+
+    try {
+        const response = await fetchWithBackoff(TTS_API_URL + GEMINI_API_KEY, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        const part = result?.candidates?.[0]?.content?.parts?.[0];
+        
+        if (part && part.inlineData && part.inlineData.data && part.inlineData.mimeType) {
+            await playAudio(part.inlineData.data, part.inlineData.mimeType);
+        } else {
+            console.error("TTS API: Audio data missing or malformed.");
+        }
+    } catch (e) {
+        console.error("TTS API Error:", e);
+    }
+}
+
+// --- UI & RENDERING ---
+
+function renderCode(text) {
+    // Markdown code blocklarını bul (```language\ncode\n```)
+    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    let match;
+    let htmlContent = '';
+    let lastIndex = 0;
+
+    // Kodu ayrıştırmak için döngü
+    while ((match = codeBlockRegex.exec(text)) !== null) {
+        // Kod bloğu öncesindeki metni ekle
+        htmlContent += `<p>${text.substring(lastIndex, match.index).trim()}</p>`;
+
+        const language = match[1] || 'plaintext';
+        const code = match[2].trim();
+
+        // Kod ve önizleme bileşeni
+        htmlContent += `
+            <div class="bg-gray-100 p-3 rounded-xl mt-3 dark:bg-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-semibold uppercase text-blue-600 dark:text-blue-400">
+                        Kod: ${language.toUpperCase()}
+                    </span>
+                    <button class="copy-code-btn text-xs text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-300 transition duration-150 p-1 rounded" data-code="${encodeURIComponent(code)}">
+                        Kopyala
+                    </button>
+                </div>
+                <pre><code class="language-${language}">${code}</code></pre>
+            </div>
+        `;
+        lastIndex = match.index + match[0].length;
+    }
+
+    // Kod bloğu sonrası kalan metni ekle
+    htmlContent += `<p>${text.substring(lastIndex).trim()}</p>`;
+    
+    // Eğer tüm metin sadece kod bloğuysa, boş p etiketlerini temizle
+    htmlContent = htmlContent.replace(/<p><\/p>/g, '').trim();
+
+    return htmlContent;
+}
+
+function renderMessages() {
+    chatArea.innerHTML = '';
+    if (messages.length === 0) {
+        initialStateMsg.classList.remove('hidden');
+        return;
+    }
+    initialStateMsg.classList.add('hidden');
+
+    messages.forEach(m => {
+        const div = document.createElement('div');
+        div.className = m.type === 'user' 
+            ? 'chat-bubble user-bubble self-end' 
+            : 'chat-bubble ai-bubble self-start';
+        
+        if (m.image) {
+            const img = document.createElement('img');
+            img.src = m.image; 
+            img.alt = 'Yüklenen görsel';
+            img.className = 'w-full h-auto rounded-lg mb-2 max-w-full object-cover border border-gray-200 dark:border-gray-600';
+            div.appendChild(img);
+        }
+
+        const textContent = m.text;
+        
+        if (m.type === 'ai' && textContent.includes('```')) {
+            // Kod bloğu içeriyorsa özel render et
+            div.innerHTML += renderCode(textContent);
+        } else {
+            // Normal metin (veya kodsuz metin)
+            const textNode = document.createElement('p');
+            textNode.textContent = textContent;
+            div.appendChild(textNode);
+        }
+        
+        chatArea.appendChild(div);
+    });
+    chatArea.scrollTop = chatArea.scrollHeight;
+    
+    // Kopyalama butonları için event listenerları ekle
+    document.querySelectorAll('.copy-code-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const code = decodeURIComponent(e.target.dataset.code);
+            // document.execCommand('copy') iframe ortamında daha güvenilirdir
+            const tempInput = document.createElement('textarea');
+            tempInput.value = code;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            
+            e.target.textContent = 'Kopyalandı!';
+            setTimeout(() => e.target.textContent = 'Kopyala', 1500);
+        });
+    });
+}
+
+function renderConversationsList() {
+    conversationsListEl.innerHTML = '';
+    
+    if (conversations.length === 0) {
+        noChatsMsg.classList.remove('hidden');
+        return;
+    }
+    noChatsMsg.classList.add('hidden');
+
+    saveStateToLocalStorage(false);
+
+    conversations.forEach(chat => {
+        const button = document.createElement('button');
+        button.className = `w-full text-left p-3 rounded-xl transition duration-150 truncate ${
+            chat.id === currentChatId 
+                ? 'bg-blue-600 text-white shadow-md' 
+                : 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600'
+        }`;
+        button.textContent = chat.title;
+        button.onclick = () => loadChat(chat.id);
+        conversationsListEl.appendChild(button);
+    });
+}
+
+/** Yeni sohbet başlatma fonksiyonu */
+function handleNewChat(showStatus = true) {
+    currentChatId = crypto.randomUUID(); 
+    messages = [];
+    localStorage.setItem('muai_active_chat_id', currentChatId); 
+    
+    renderMessages();
+    messageInput.value = '';
+    imageInput.value = '';
+    imagePreviewContainer.classList.add('hidden');
+    imagePreview.src = '';
+    updateButtonState();
+    aiToolsMenu.classList.remove('open'); // Menüyü kapat
+    
+    chatListSidebar.classList.remove('open');
+    renderConversationsList(); 
+    
+    if (showStatus) {
+        statusMessage.textContent = 'Yeni sohbet başlatıldı.';
+        statusMessage.classList.remove('hidden');
+        setTimeout(() => statusMessage.classList.add('hidden'), 2000);
+    }
+}
+
+/** Belirli bir sohbeti yükler ve aktif hale getirir. */
+function loadChat(chatId) {
+    if (currentChatId === chatId) {
+        chatListSidebar.classList.remove('open');
+        return;
+    }
+
+    const chatToLoad = conversations.find(c => c.id === chatId);
+
+    if (chatToLoad) {
+        saveStateToLocalStorage(false); 
+
+        currentChatId = chatId;
+        messages = chatToLoad.messages;
+        localStorage.setItem('muai_active_chat_id', currentChatId);
+
+        renderMessages();
+        renderConversationsList(); 
+        chatListSidebar.classList.remove('open');
+    }
+}
+
+// --- MAIN SEND LOGIC (Chat Message) ---
+
+async function handleSend() {
+    const text = messageInput.value.trim();
+    const imageFile = imageInput.files[0] || null;
+
+    if (!text && !imageFile) return;
+    statusMessage.classList.add('hidden');
+    replySuggestionsContainer.classList.add('hidden');
+    aiToolsMenu.classList.remove('open');
+
+    abortController = new AbortController();
+    const signal = abortController.signal;
+
+    toggleInputState(true, 'sendBtn', true); // true: Durdur butonu göster
+
+    let imageApiData = null; 
+    let imageDisplayData = null; 
+    let newUserMsg = null;
+
+    try {
+        // 1. Process User Message and Image
+        if (imageFile) {
+            const data = await fileToBase64(imageFile);
+            imageApiData = { mimeType: data.mimeType, data: data.data };
+            imageDisplayData = data.dataUrl;
+        }
+
+        // 2. Prepare User Message for History
+        newUserMsg = {
+            type: 'user',
+            text: text || (imageFile ? 'Görsel gönderildi.' : ''),
+            image: imageDisplayData
+        };
+        messages.push(newUserMsg);
+        renderMessages();
+        
+        // 3. Get AI Response
+        const aiText = await generalGeminiCall(
+            signal,
+            messages.slice(0, -1),
+            text, 
+            imageApiData
+        );
+
+        // 4. Save AI Response to Local State
+        const newAiMsg = {
+            type: 'ai',
+            text: aiText,
+            image: null
+        };
+        messages.push(newAiMsg);
+
+        // 5. Save Conversation to LocalStorage
+        saveStateToLocalStorage(false); 
+
+        // 6. Render and Speak AI Response (Optional)
+        renderMessages();
+        renderConversationsList();
+        if (settings.ttsEnabled) { 
+            await callTtsApi(aiText);
+        }
+
+    } catch (e) {
+        if (e.message === "İşlem İptal Edildi") {
+            statusMessage.textContent = 'Gönderme işlemi iptal edildi.';
+        } else {
+            console.error("Hata oluştu:", e);
+            statusMessage.textContent = `Mesaj gönderilemedi: ${e.message}. Konsolu kontrol edin.`;
+        }
+        statusMessage.classList.remove('hidden');
+        
+        // Hata durumunda (iptal dahil) son kullanıcı mesajını çıkar
+        if (newUserMsg) messages.pop();
+        renderMessages();
+    } finally {
+        // Reset UI
+        messageInput.value = '';
+        imageInput.value = '';
+        imagePreviewContainer.classList.add('hidden');
+        imagePreview.src = '';
+        abortController = null;
+        toggleInputState(false);
+    }
+}
+
+// --- AI TOOL LOGIC (Summarize / Continue / Code Gen / Suggest Reply) ---
+
+function toggleInputState(isLoading, currentToolId = 'sendBtn', showStopBtn = false) {
+    const isMainSend = currentToolId === 'sendBtn';
+
+    messageInput.disabled = isLoading;
+    imageInput.disabled = isLoading;
+    aiMenuToggle.disabled = isLoading;
+    
+    // AI Tool Butonlarını (menü içindekileri) yönet
+    document.querySelectorAll('.ai-tool-btn').forEach(btn => {
+        const isToolActive = btn.id === currentToolId;
+        // Eğer yükleniyorsa disable et
+        if (isLoading) {
+            btn.disabled = true;
+            if (isToolActive && showStopBtn) {
+                 btn.innerHTML = '<div class="loader"></div> Durdur';
+                 btn.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'; // Kırmızımsı arka plan
+                 btn.style.color = '#ef4444'; // Kırmızı yazı
+            }
+        } else {
+            // Yüklenme bittiyse orijinal durumu geri getir
+            btn.style.backgroundColor = '';
+            btn.style.color = '';
+            btn.innerHTML = btn.originalHTML;
+            // Durum güncellemeyi trigger et (updateButtonState)
+        }
+    });
+
+    if (isMainSend) {
+        sendBtn.innerHTML = showStopBtn ? '<div class="loader"></div> Durdur' : (isLoading ? '<div class="loader"></div>' : 'Gönder');
+        // Stop butonu için event listener
+        sendBtn.onclick = showStopBtn ? handleStop : handleSend;
+    }
+
+    updateButtonState();
+}
+
+function handleStop() {
+    if (abortController) {
+        abortController.abort();
+    }
+    toggleInputState(false);
+    statusMessage.textContent = 'İşlem iptal ediliyor...';
+    statusMessage.classList.remove('hidden');
+    setTimeout(() => statusMessage.classList.add('hidden'), 2000);
+}
+
+async function handleAITool(toolType) {
+    const text = messageInput.value.trim();
+    if (toolType !== 'suggestReply' && !text) return;
+    if (toolType === 'suggestReply' && (messages.length === 0 || text)) return;
+
+    const buttonId = 
+        toolType === 'summarize' ? 'summarizeBtn' : 
+        toolType === 'continueText' ? 'continueTextBtn' : 
+        toolType === 'generateCode' ? 'generateCodeBtn' :
+        'suggestReplyBtn';
+    
+    const btnElement = document.getElementById(buttonId);
+    if (!btnElement.originalHTML) {
+        btnElement.originalHTML = btnElement.innerHTML;
+    }
+    
+    abortController = new AbortController();
+    const signal = abortController.signal;
+
+    toggleInputState(true, buttonId, true);
+    statusMessage.classList.add('hidden');
+    replySuggestionsContainer.classList.add('hidden');
+    aiToolsMenu.classList.remove('open');
+
+
+    let instruction;
+    let successMessage;
+    let aiResult;
+
+    try {
+        if (toolType === 'summarize') {
+            instruction = `Summarize the following text concisely in one or two paragraphs. The summary should be in the user's selected language (${settings.lang}). Return only the summary text.`;
+            aiResult = await generalGeminiCall(signal, [], text, null, instruction);
+            successMessage = "Özetleme işlemi tamamlandı.";
+
+            const userMsg = { type: 'user', text: `[ÖZET İSTEĞİ] Metin:\n${text.substring(0, 100)}...` };
+            const aiMsg = { type: 'ai', text: `✨ Özet: ${aiResult}` };
+            messages.push(userMsg, aiMsg);
+            saveStateToLocalStorage(false);
+            renderMessages();
+
+            if (settings.ttsEnabled) { 
+                await callTtsApi(`Özetleme: ${aiResult}`);
+            }
+
+        } else if (toolType === 'continueText') {
+            instruction = `Continue the following text logically and creatively to complete a short paragraph. The continuation must be in the user's selected language (${settings.lang}). Return ONLY the continued text.`;
+            aiResult = await generalGeminiCall(signal, [], text, null, instruction);
+            successMessage = "Metin tamamlama işlemi tamamlandı.";
+            
+            messageInput.value = text + " " + aiResult.trim();
+
+        } else if (toolType === 'generateCode') {
+             instruction = `Generate a single, complete, and functional code snippet based on the following request: "${text}". The code must be enclosed in a single markdown code block (e.g., \`\`\`html... \`\`\`). Do not provide any conversational text outside of the code block.`;
+            aiResult = await generalGeminiCall(signal, [], text, null, instruction);
+            successMessage = "Kod oluşturma işlemi tamamlandı.";
+            
+            const userMsg = { type: 'user', text: `[KOD İSTEĞİ] ${text}` };
+            const aiMsg = { type: 'ai', text: `👨‍💻 Kod Üretimi:\n${aiResult}` };
+            messages.push(userMsg, aiMsg);
+            saveStateToLocalStorage(false);
+            renderMessages();
+
+        } else if (toolType === 'suggestReply') {
+            instruction = `Based on the chat history (which includes the last user message and the model's last reply), generate 3 short, conversational, and contextually appropriate reply suggestions. The replies must be in the user's selected language (${settings.lang}). Return only a JSON array of 3 strings.`;
+            successMessage = "Yanıt önerileri yüklendi.";
+
+            const contextHistory = messages.slice(-5); 
+            
+            const replySchema = {
+                type: "ARRAY",
+                items: { type: "STRING" }
+            };
+            
+            aiResult = await structuredGeminiCall(signal, contextHistory, instruction, replySchema);
+            renderReplySuggestions(aiResult);
+        }
+
+        statusMessage.textContent = successMessage;
+        statusMessage.classList.remove('hidden');
+        setTimeout(() => statusMessage.classList.add('hidden'), 3000);
+
+    } catch (e) {
+        if (e.message !== "İşlem İptal Edildi") {
+            statusMessage.textContent = e.message || "AI aracı kullanılırken bir hata oluştu.";
+            statusMessage.classList.remove('hidden');
+        }
+    } finally {
+        abortController = null;
+        toggleInputState(false);
+    }
+}
+
+function renderReplySuggestions(suggestions) {
+    replySuggestionsContainer.innerHTML = '';
+    
+    if (Array.isArray(suggestions) && suggestions.length > 0) {
+        suggestions.forEach(reply => {
+            const btn = document.createElement('button');
+            btn.className = 'text-sm px-3 py-2 bg-blue-500 text-white rounded-xl shadow-md hover:bg-blue-600 transition duration-150 truncate max-w-full';
+            btn.textContent = reply;
+            btn.onclick = () => {
+                messageInput.value = reply;
+                handleSend(); // Tıkladıktan sonra doğrudan gönder
+            };
+            replySuggestionsContainer.appendChild(btn);
+        });
+        replySuggestionsContainer.classList.remove('hidden');
+    } else {
+        replySuggestionsContainer.classList.add('hidden');
+    }
+}
+
+// --- THEME LOGIC ---
+
+function applyTheme(theme) {
+    if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+}
+
+// --- EVENT LISTENERS and SETUP ---
+
+function updateButtonState() {
+    const text = messageInput.value.trim();
+    const hasImage = imageInput.files.length > 0;
+    const hasHistory = messages.length > 0;
+    const isSending = abortController !== null;
+    
+    // Gönder butonu her zaman disable, eğer loading varsa toggleInputState'te Durdur'a döner
+    sendBtn.disabled = (!text && !hasImage) || isSending; 
+    
+    // AI Tool butonları (menü içinde)
+    const textAvailable = text !== '';
+    const toolsEnabled = !isSending;
+    
+    summarizeBtn.disabled = !textAvailable || !toolsEnabled;
+    continueTextBtn.disabled = !textAvailable || !toolsEnabled;
+    generateCodeBtn.disabled = !textAvailable || !toolsEnabled; // Yeni buton
+    
+    // Yanıt Öner butonu için (Metin olmamalı, geçmiş olmalı)
+    suggestReplyBtn.disabled = textAvailable || !hasHistory || !toolsEnabled;
+
+    // Eğer metin varsa önerileri gizle
+    if (textAvailable || isSending) {
+        replySuggestionsContainer.classList.add('hidden');
+    }
+    
+    // Eğer menü açıksa ve loading başladıysa kapat
+    if (isSending) {
+        aiToolsMenu.classList.remove('open');
+    }
+}
+
+function saveSettings() {
+    settings.lang = langSelectModal.value;
+    settings.voice = voiceSelectModal.value;
+    settings.ttsEnabled = ttsToggleModal.checked;
+    settings.theme = themeToggleModal.checked ? 'dark' : 'light';
+    
+    saveStateToLocalStorage(true); 
+    applyTheme(settings.theme);
+}
+
+// Sidebar Toggles
+toggleSidebarBtn.addEventListener('click', () => { chatListSidebar.classList.add('open'); renderConversationsList(); });
+closeSidebarBtn.addEventListener('click', () => { chatListSidebar.classList.remove('open'); });
+
+// Settings Modal Toggles
+settingsBtn.addEventListener('click', () => {
+    langSelectModal.value = settings.lang;
+    voiceSelectModal.value = settings.voice;
+    ttsToggleModal.checked = settings.ttsEnabled;
+    themeToggleModal.checked = settings.theme === 'dark';
+    settingsModal.classList.remove('hidden');
+});
+closeSettingsBtn.addEventListener('click', () => {
+    saveSettings(); 
+    settingsModal.classList.add('hidden');
+});
+
+// AI Menu Toggle
+aiMenuToggle.addEventListener('click', (e) => {
+    // Tıklamayı engelleme
+    e.stopPropagation();
+    aiToolsMenu.classList.toggle('open');
+});
+
+// Menü dışına tıklayınca menüyü kapat
+document.addEventListener('click', (e) => {
+    if (!aiToolsMenu.contains(e.target) && e.target !== aiMenuToggle) {
+        aiToolsMenu.classList.remove('open');
+    }
+});
+
+
+// New Chat Button
+newChatBtn.addEventListener('click', () => handleNewChat(true));
+
+// Send & Input Listeners
+sendBtn.addEventListener('click', handleSend); // Başlangıçta handleSend olarak ayarlı
+messageInput.addEventListener('input', updateButtonState);
+messageInput.addEventListener('keydown', (e) => { 
+    if(e.key === 'Enter' && !sendBtn.disabled && !abortController) {
+        e.preventDefault(); 
+        handleSend(); 
+    }
+});
+
+// AI Tool Buttons Listeners
+document.querySelectorAll('.ai-tool-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        handleAITool(btn.dataset.tool);
+    });
+});
+
+// Image preview logic
+imageInput.addEventListener('change', (e) => {
+    updateButtonState();
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            imagePreview.src = e.target.result;
+            imagePreviewContainer.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    } else {
+        imagePreviewContainer.classList.add('hidden');
+        imagePreview.src = '';
+    }
+});
+
+// Clear image
+clearImageBtn.addEventListener('click', () => {
+    imageInput.value = '';
+    imagePreviewContainer.classList.add('hidden');
+    imagePreview.src = '';
+    updateButtonState();
+});
+
+// --- DRAG AND DROP SETUP ---
+function setupDragAndDrop() {
+    const dropArea = document.body;
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, (e) => {
+             if (e.target === dropArea) unhighlight(e);
+        }, false);
+    });
+
+    dropArea.addEventListener('drop', handleDrop, false);
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlight(e) {
+        dropArea.classList.add('drag-over');
+    }
+
+    function unhighlight(e) {
+        dropArea.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+
+        if (files.length > 0 && files[0].type.startsWith('image/')) {
+            imageInput.files = files;
+            imageInput.dispatchEvent(new Event('change'));
+        }
+    }
+}
+
+
+// --- INITIALIZATION ---
+window.onload = () => {
+    loadStateFromLocalStorage(); 
+    applyTheme(settings.theme); 
+    renderMessages();
+    renderConversationsList();
+    updateButtonState();
+    setupDragAndDrop(); 
+};
+</script>
 </body>
 </html>
