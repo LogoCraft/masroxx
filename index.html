@@ -1,1297 +1,1228 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MuAi - Kod Üretimi ve Gelişmiş Kontrol</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-  /* Theme Variables */
-  :root {
-    --bg-color-light: #f3f4f6;
-    --bg-color-dark: #111827;
-    --text-color-light: #1f2937;
-    --text-color-dark: #e5e7eb;
-    --card-bg-light: #ffffff;
-    --card-bg-dark: #1f2937;
-    --input-bg-light: #ffffff;
-    --input-bg-dark: #374151;
-  }
-  body { 
-    font-family: 'Inter', sans-serif; 
-    transition: background-color 0.3s, color 0.3s;
-    background-color: var(--bg-color-light); 
-    color: var(--text-color-light);
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate="appTitle">LogoLife</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Inter font for modern look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* === CSS Değişkenleri (Varsayılan: TURUNCU/KOYU SİYAH TEMA) === */
+        :root {
+            /* Renkler */
+            --primary-bg: #0A0A0A; 
+            --secondary-bg: #1C1C1C; 
+            --main-text: #F0F0F0; 
+            
+            /* Turuncu Aksan Renkleri */
+            --accent-color: #FF5722; 
+            
+            /* Input Renkleri */
+            --input-bg: #282828; 
+            --input-text: #E0E0E0;
+            --border-color: #333333; 
+            
+            /* Efektler (Turuncu Neon) */
+            --glow-shadow: 0 0 15px rgba(255, 87, 34, 1), 0 0 30px rgba(255, 87, 34, 0.7);
+            --btn-glow-shadow: 0 0 10px rgba(255, 87, 34, 0.9);
+            --btn-hover-glow: 0 0 20px rgba(255, 87, 34, 1), 0 0 35px rgba(255, 87, 34, 0.8);
 
-  /* Dark Mode Styles */
-  html.dark body {
-    background-color: var(--bg-color-dark);
-    color: var(--text-color-dark);
-  }
-  html.dark .header, html.dark .input-area, html.dark #chatListSidebar {
-    background-color: #1f2937; 
-    border-color: #374151;
-  }
-  html.dark .ai-bubble {
-    background-color: var(--input-bg-dark);
-    color: var(--text-color-dark);
-  }
-  html.dark #messageInput {
-    background-color: var(--input-bg-dark);
-    color: var(--text-color-dark);
-    border-color: #4b5563;
-  }
+            /* Arkaplan Gradyan Renkleri */
+            --bg-gradient-start: rgba(255, 87, 34, 0.15); 
+            --bg-gradient-end: rgba(255, 87, 34, 0.05); 
+            
+            transition: all 0.5s ease-in-out; 
+        }
 
-  /* Chat Bubble & Scrollbar */
-  #chatArea::-webkit-scrollbar { width: 8px; }
-  #chatArea::-webkit-scrollbar-thumb { background-color: #9ca3af; border-radius: 4px; }
-  #chatArea::-webkit-scrollbar-track { background-color: #f5f5f5; }
-  html.dark #chatArea::-webkit-scrollbar-thumb { background-color: #6b7280; }
-  html.dark #chatArea::-webkit-scrollbar-track { background-color: #374151; }
+        /* === KIRMIZI TEMA === */
+        .red-theme {
+            --primary-bg: #0A0A0A; 
+            --accent-color: #E91E63; 
+            --glow-shadow: 0 0 15px rgba(233, 30, 99, 1), 0 0 30px rgba(233, 30, 99, 0.7);
+            --btn-glow-shadow: 0 0 10px rgba(233, 30, 99, 0.9);
+            --btn-hover-glow: 0 0 20px rgba(233, 30, 99, 1), 0 0 35px rgba(233, 30, 99, 0.8);
+            --bg-gradient-start: rgba(233, 30, 99, 0.15); 
+            --bg-gradient-end: rgba(233, 30, 99, 0.05); 
+        }
 
-  .chat-bubble {
-    padding: 12px;
-    border-radius: 16px;
-    max-width: 80%;
-    word-wrap: break-word;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    animation: fadeIn 0.3s ease-out;
-  }
-  .user-bubble {
-    background-color: #3b82f6; 
-    color: white;
-    margin-left: auto;
-    border-top-right-radius: 4px;
-  }
-  .ai-bubble {
-    background-color: var(--card-bg-light); 
-    color: var(--text-color-light); 
-    margin-right: auto;
-    border-top-left-radius: 4px;
-  }
+        /* === MAVİ TEMA === */
+        .blue-theme {
+            --primary-bg: #F0F8FF; 
+            --secondary-bg: #E6F7FF; 
+            --main-text: #102A43; 
+            --accent-color: #00BFFF; 
+            --input-bg: #FFFFFF; 
+            --input-text: #102A43; 
+            --border-color: #B3D9FF; 
+            --glow-shadow: 0 0 12px rgba(0, 191, 255, 0.9), 0 0 25px rgba(179, 217, 255, 0.5); 
+            --btn-glow-shadow: 0 0 8px rgba(0, 191, 255, 0.8);
+            --btn-hover-glow: 0 0 15px rgba(0, 191, 255, 1), 0 0 25px rgba(179, 217, 255, 0.7);
+            --bg-gradient-start: rgba(0, 191, 255, 0.15); 
+            --bg-gradient-end: rgba(0, 191, 255, 0.05); 
+        }
 
-  /* Code Block Styling */
-  .ai-bubble pre {
-    background-color: #1f2937; 
-    color: #e5e7eb;
-    padding: 12px;
-    border-radius: 8px;
-    overflow-x: auto;
-    margin-top: 8px;
-    font-size: 0.9rem;
-    line-height: 1.4;
-  }
-  .ai-bubble code {
-    white-space: pre; /* Pre-wrap'ı koru */
-  }
+        /* === Genel Stil Uygulamaları === */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-bg) !important;
+            color: var(--main-text); 
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 50% 10%, var(--bg-gradient-start) 0%, transparent 40%),
+                              radial-gradient(circle at 50% 90%, var(--bg-gradient-end) 0%, transparent 40%),
+                              radial-gradient(circle at 0% 50%, var(--bg-gradient-end) 0%, transparent 40%),
+                              radial-gradient(circle at 100% 50%, var(--bg-gradient-end) 0%, transparent 40%);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+            background-repeat: no-repeat;
+            background-attachment: fixed; 
+            transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out, background-image 0.5s ease-in-out;
+        }
 
-  /* Sidebar transition */
-  #chatListSidebar {
-    transition: transform 0.3s ease-in-out;
-    transform: translateX(-100%);
-  }
-  #chatListSidebar.open {
-    transform: translateX(0);
-  }
-  
-  /* Drag Over Styling */
-  .drag-over {
-      border: 3px dashed #3b82f6 !important;
-      background-color: rgba(59, 130, 246, 0.1) !important;
-  }
+        header { background-color: var(--secondary-bg); z-index: 50; }
+        .card-bg { background-color: var(--secondary-bg); }
+        .neon-accent { color: var(--accent-color); }
+        .bg-neon-accent { background-color: var(--accent-color); }
+        .border-neon-accent { border-color: var(--accent-color); }
+        
+        input:not([type="file"]), select, textarea {
+            background-color: var(--input-bg) !important;
+            color: var(--input-text) !important;
+            border-color: var(--border-color) !important;
+            transition: all 0.5s ease-in-out;
+        }
 
-  /* Loading Spinner */
-  .loader {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    animation: spin 1s linear infinite;
-  }
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  /* Aesthetic Settings Modal - Lucide/Custom Icons */
-  .icon-style {
-    width: 20px;
-    height: 20px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  
-  /* AI Tools Menu Toggle */
-  #aiToolsMenu {
-      transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
-      transform-origin: bottom left;
-      opacity: 0;
-      transform: scale(0.9);
-      pointer-events: none;
-  }
-  #aiToolsMenu.open {
-      opacity: 1;
-      transform: scale(1);
-      pointer-events: auto;
-  }
-  
-  /* Custom scrollbar for menu */
-  .scrollable-menu::-webkit-scrollbar { width: 4px; }
-  .scrollable-menu::-webkit-scrollbar-thumb { background-color: #a7a7a7; border-radius: 2px; }
-  .scrollable-menu::-webkit-scrollbar-track { background-color: transparent; }
-</style>
+        .text-glow { text-shadow: var(--glow-shadow); transition: text-shadow 0.5s ease-in-out, color 0.5s ease-in-out; }
+        .card-glow { box-shadow: 0 0 5px var(--border-color); transition: all 0.4s ease-in-out; }
+        .card-glow:hover { box-shadow: var(--glow-shadow); transform: translateY(-5px); }
+        
+        .btn-neon { 
+            transition: all 0.3s ease; 
+            box-shadow: var(--btn-glow-shadow); 
+            color: var(--primary-bg) !important; 
+        }
+        .btn-neon:hover { 
+            box-shadow: var(--btn-hover-glow); 
+            transform: scale(1.03); 
+        }
+        
+        #cart-modal {
+            max-width: 400px;
+            right: 0;
+            top: 0;
+            height: 100%;
+            z-index: 1002;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        #cart-modal.open {
+            transform: translateX(0);
+        }
+        
+        /* GİZLİ YÖNETİCİ GİRİŞ KUTUSU */
+        #admin-login-box {
+            bottom: 0; right: 0; z-index: 1000; width: 280px; padding: 1rem;
+            border-top-left-radius: 0.75rem; border-top: 2px solid var(--accent-color);
+            transition: transform 0.3s ease-in-out;
+        }
+        .admin-hidden { transform: translateY(100%); }
+        .admin-trigger { cursor: pointer; user-select: none; opacity: 0.1; transition: opacity 0.3s; }
+        .admin-trigger:hover { opacity: 0.3; }
+        
+    </style>
 </head>
-<body class="flex flex-col h-screen">
+<body class="min-h-screen">
 
-<!-- Sidebar for Chat History -->
-<div id="chatListSidebar" class="fixed top-0 left-0 h-full w-64 shadow-xl z-50 flex flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-    <div class="p-4 flex justify-between items-center border-b dark:border-gray-700">
-        <h2 class="text-xl font-bold text-blue-600">Sohbet Geçmişi</h2>
-        <button id="closeSidebarBtn" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white text-2xl leading-none">&times;</button>
-    </div>
     
-    <div class="p-4">
-        <button id="newChatBtn" class="w-full bg-green-500 text-white px-4 py-2 rounded-xl font-semibold shadow-md hover:bg-green-600 transition duration-150 text-sm mb-4">
-            + Yeni Sohbet Başlat
-        </button>
-    </div>
-
-    <div id="conversationsList" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
-        <p id="noChatsMsg" class="text-sm text-gray-500 text-center dark:text-gray-400">Henüz sohbet yok.</p>
-    </div>
-</div>
-
-<!-- Header -->
-<div class="header bg-white shadow-lg p-4 flex justify-between items-center z-20 dark:bg-gray-800">
-    <div class="flex items-center">
-        <!-- Sidebar Toggle Icon (Hamburger) -->
-        <button id="toggleSidebarBtn" class="text-2xl text-gray-700 mr-4 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 leading-none">&#x2261;</button>
-        <h1 class="text-3xl font-bold text-blue-600">MuAi</h1>
-    </div>
-    
-    <div class="flex gap-2">
-        <button id="settingsBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl font-semibold shadow-md hover:bg-gray-300 transition duration-150 text-sm dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
-            Ayarlar
-        </button>
-    </div>
-</div>
-
-<!-- Chat Area -->
-<div id="chatArea" class="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
-    <div id="initialStateMsg" class="text-center text-gray-500 mt-12 dark:text-gray-400">
-        <p class="text-xl font-semibold mb-2">Hoş Geldiniz!</p>
-        <p>Sol üstteki menüden eski sohbetlerinize ulaşabilir veya yeni bir sohbet başlatabilirsiniz.</p>
-        <p class="mt-4 text-blue-500">İlk mesajınızı gönderin, bir resim sürükleyip bırakın veya alt kısımdaki AI menüsünü kullanın.</p>
-    </div>
-</div>
-
-<!-- Input Area -->
-<div class="input-area p-4 bg-white border-t border-gray-200 shadow-inner sticky bottom-0 z-10 dark:bg-gray-800 dark:border-gray-700">
-    <div class="flex flex-col gap-3">
-
-        <!-- Image Input Preview -->
-        <div id="imagePreviewContainer" class="hidden relative p-2 border border-dashed border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
-            <img id="imagePreview" class="max-h-24 w-auto rounded-md object-cover" src="" alt="Image Preview" />
-            <button id="clearImageBtn" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 leading-none text-xs w-5 h-5 flex items-center justify-center font-bold transition hover:bg-red-700">&times;</button>
-        </div>
-
-        <input type="file" id="imageInput" accept="image/*" class="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-800 dark:file:text-blue-100 dark:hover:file:bg-blue-700" />
-        
-        <!-- Reply Suggestions Container -->
-        <div id="replySuggestionsContainer" class="hidden flex flex-wrap gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-            <!-- Suggestions will go here -->
-        </div>
-
-        <div class="flex gap-2 relative">
-            <!-- AI Tools Menu Button -->
-            <button id="aiMenuToggle" class="relative bg-gray-200 text-gray-700 w-12 h-12 flex items-center justify-center rounded-xl shadow-md hover:bg-gray-300 transition duration-150 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600" title="AI Araçları">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-            </button>
+    <header class="p-4 border-b shadow-lg sticky top-0" style="border-color: var(--border-color);">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-extrabold tracking-widest text-glow" style="color: var(--main-text);" data-translate="appTitle">
+                LOGO<span class="neon-accent">VERS</span>
+            </h1>
             
-            <!-- AI Tools Dropdown Menu -->
-            <div id="aiToolsMenu" class="absolute bottom-full left-0 mb-2 w-52 bg-white rounded-xl shadow-2xl p-2 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 z-30">
-                <button id="summarizeBtn" data-tool="summarize" class="ai-tool-btn w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm text-purple-700 hover:bg-purple-50 dark:text-purple-300 dark:hover:bg-purple-900 transition duration-150 disabled:opacity-50" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="M15 4.7l-1.7 1.7"/><path d="M17 9h-2"/><path d="M14.7 12.3l1.7 1.7"/><path d="M12 15v-2"/><path d="M9.3 12.3l-1.7 1.7"/><path d="M7 9H9"/><path d="M9.3 4.7l-1.7 1.7"/><circle cx="12" cy="12" r="10"/><path d="M12 21v-2"/></svg>
-                    Metni Özetle
-                </button>
-                <button id="continueTextBtn" data-tool="continueText" class="ai-tool-btn w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm text-teal-700 hover:bg-teal-50 dark:text-teal-300 dark:hover:bg-teal-900 transition duration-150 disabled:opacity-50" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M3 10h10"/><path d="M11 6h10"/><path d="M12 14h9"/><path d="M3 18h5"/><path d="M3 6h5"/></svg>
-                    Devamını Yaz
-                </button>
-                <button id="generateCodeBtn" data-tool="generateCode" class="ai-tool-btn w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm text-orange-700 hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-orange-900 transition duration-150 disabled:opacity-50" disabled>
-                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
-                    Kod Oluştur
-                </button>
-                <button id="suggestReplyBtn" data-tool="suggestReply" class="ai-tool-btn w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm text-indigo-700 hover:bg-indigo-50 dark:text-indigo-300 dark:hover:bg-indigo-900 transition duration-150 disabled:opacity-50" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 9 12 4 17 9"/><line x1="12" y1="4" x2="12" y2="16"/></svg>
-                    Yanıt Öner
-                </button>
-            </div>
-            
-            <input id="messageInput" type="text" placeholder="Bir mesaj yazın veya bir fotoğraf sürükleyip bırakın..." class="flex-1 border border-gray-300 p-3 rounded-xl focus:ring-blue-500 focus:border-blue-500 transition duration-150 shadow-md dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
-            <button id="sendBtn" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:bg-blue-700 transition duration-150 disabled:bg-blue-300 disabled:shadow-none dark:disabled:bg-blue-800" disabled>
-                Gönder
-            </button>
-        </div>
-        <div id="statusMessage" class="text-center text-sm text-red-500 hidden"></div>
-    </div>
-</div>
+            <div class="flex items-center space-x-4 sm:space-x-6">
+                
+                <nav class="hidden sm:flex space-x-6 text-sm font-medium">
+                    <a href="#parali" class="hover:neon-accent transition duration-200 hover:text-glow" data-translate="headerNavPaid">Ücretli</a>
+                    <a href="#ucretsiz" class="hover:neon-accent transition duration-200 hover:text-glow" data-translate="headerNavFree">Ücretsiz</a>
+                    <a href="#kendi-istegi" class="hover:neon-accent transition duration-200 hover:text-glow" data-translate="headerNavCustom">Özel İstek</a>
+                    <a href="#" onclick="toggleAdminPanel()" id="admin-link-nav" class="hidden hover:neon-accent transition duration-200 text-red-400" data-translate="headerNavAdmin">Yönetici Paneli</a>
+                </nav>
 
-<!-- Aesthetic Settings Modal -->
-<div id="settingsModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all dark:bg-gray-800 border-t-4 border-blue-500">
-        <h2 class="text-2xl font-extrabold mb-6 text-gray-900 dark:text-white flex items-center">
-            <svg class="icon-style w-6 h-6 mr-3 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><path d="M12 10v4"/></svg>
-            Uygulama Ayarları
-        </h2>
-        
-        <!-- Tema Seçeneği -->
-        <div class="flex items-center justify-between mb-4 p-4 rounded-xl transition duration-200 bg-gray-50 dark:bg-gray-700 shadow-sm border border-gray-100 dark:border-gray-700">
-            <label for="themeToggleModal" class="text-sm font-medium text-gray-700 select-none dark:text-gray-200 flex items-center">
-                <svg class="icon-style mr-3 text-yellow-500 dark:text-blue-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>
-                Gece Modu
-            </label>
-            <input type="checkbox" id="themeToggleModal" class="appearance-none h-6 w-11 bg-gray-300 rounded-full checked:bg-blue-500 transition duration-300 ease-in-out relative cursor-pointer" style="margin-right: -4px;">
-        </div>
-
-        <!-- Dil Seçeneği -->
-        <div class="mb-4 p-4 rounded-xl transition duration-200 bg-gray-50 dark:bg-gray-700 shadow-sm border border-gray-100 dark:border-gray-700">
-            <label for="langSelectModal" class="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-200 flex items-center">
-                <svg class="icon-style mr-3 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 8h4"/><path d="M10 12l.96-2.93a3.52 3.52 0 0 1 5.08-1.55L19 9"/><path d="M22 10.66V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8"/><path d="M15 15h6"/></svg>
-                AI Yanıt Dili
-            </label>
-            <select id="langSelectModal" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500">
-                <option value="tr-TR">Türkçe (Turkish)</option>
-                <option value="en-US">English (İngilizce)</option>
-                <option value="de-DE">Deutsch (Almanca)</option>
-                <option value="az-AZ">Azərbaycanca (Azerbaijani)</option>
-                <option value="fr-FR">Français (Fransızca)</option>
-                <option value="es-ES">Español (İspanyolca)</option>
-                <option value="ru-RU">Русский (Rusça)</option>
-                <option value="ja-JP">日本語 (Japonca)</option>
-                <option value="ar-EG">العربية (Arapça)</option>
-            </select>
-        </div>
-
-        <!-- Seslendirme Ayarları -->
-        <div class="p-4 rounded-xl transition duration-200 bg-gray-50 dark:bg-gray-700 shadow-sm border border-gray-100 dark:border-gray-700 mb-6">
-            <div class="flex items-center justify-between mb-3">
-                <label for="ttsToggleModal" class="text-sm font-medium text-gray-700 select-none dark:text-gray-200 flex items-center">
-                    <svg class="icon-style mr-3 text-purple-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 13.56a2 2 0 1 0 0-3.12 2 2 0 0 0 0 3.12z"/></svg>
-                    Yanıtları Sesli Oku
-                </label>
-                <input type="checkbox" id="ttsToggleModal" class="appearance-none h-6 w-11 bg-gray-300 rounded-full checked:bg-blue-500 transition duration-300 ease-in-out relative cursor-pointer" style="margin-right: -4px;">
-            </div>
-
-            <div class="mt-4">
-                <label for="voiceSelectModal" class="block text-xs font-medium text-gray-500 mb-1 dark:text-gray-400">Ses Seçimi</label>
-                <select id="voiceSelectModal" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500">
-                    <option value="Kore">Ses 1 (Kore - Firm)</option>
-                    <option value="Puck">Ses 2 (Puck - Upbeat)</option>
-                    <option value="Zephyr">Ses 3 (Zephyr - Bright)</option>
-                </select>
-            </div>
-        </div>
-
-        <button id="closeSettingsBtn" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg shadow-blue-500/50 hover:from-blue-600 hover:to-indigo-700 transition duration-150">
-            Kapat ve Kaydet
-        </button>
-    </div>
-</div>
-
-<script>
-// --- GLOBAL CONFIGURATION ---
-const GEMINI_API_KEY = "AIzaSyC5TjJMwl_kjTF9unQbpik5exA8WDn0_Bk";
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=";
-const TTS_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=";
-
-// --- STATE MANAGEMENT (LOCAL STORAGE) ---
-let messages = []; // Aktif sohbetin mesajları
-let conversations = []; // {id: string, title: string, messages: [], updatedAt: number}
-let currentChatId = null;
-let audioContext = null;
-let abortController = null; // API durdurma/iptal kontrolörü
-
-// Local Settings State (Initial load)
-let settings = JSON.parse(localStorage.getItem('muai_settings')) || {
-    lang: "tr-TR", 
-    voice: "Kore", 
-    ttsEnabled: false, 
-    theme: "light"
-};
-
-// --- DOM ELEMENTS ---
-const chatArea = document.getElementById('chatArea');
-const messageInput = document.getElementById('messageInput');
-const sendBtn = document.getElementById('sendBtn');
-const imageInput = document.getElementById('imageInput');
-const imagePreview = document.getElementById('imagePreview');
-const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-const clearImageBtn = document.getElementById('clearImageBtn');
-const statusMessage = document.getElementById('statusMessage');
-const initialStateMsg = document.getElementById('initialStateMsg');
-
-// New AI Features
-const aiMenuToggle = document.getElementById('aiMenuToggle');
-const aiToolsMenu = document.getElementById('aiToolsMenu');
-const summarizeBtn = document.getElementById('summarizeBtn');
-const continueTextBtn = document.getElementById('continueTextBtn');
-const generateCodeBtn = document.getElementById('generateCodeBtn'); // New button
-const suggestReplyBtn = document.getElementById('suggestReplyBtn');
-const replySuggestionsContainer = document.getElementById('replySuggestionsContainer');
-
-// Sidebar/Settings UI
-const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
-const closeSidebarBtn = document.getElementById('closeSidebarBtn');
-const chatListSidebar = document.getElementById('chatListSidebar');
-const newChatBtn = document.getElementById('newChatBtn');
-const conversationsListEl = document.getElementById('conversationsList');
-const noChatsMsg = document.getElementById('noChatsMsg');
-
-const settingsBtn = document.getElementById('settingsBtn');
-const settingsModal = document.getElementById('settingsModal');
-const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-const langSelectModal = document.getElementById('langSelectModal');
-const voiceSelectModal = document.getElementById('voiceSelectModal');
-const ttsToggleModal = document.getElementById('ttsToggleModal');
-const themeToggleModal = document.getElementById('themeToggleModal');
-
-
-// --- LOCAL STORAGE FUNCTIONS ---
-
-function loadStateFromLocalStorage() {
-    // 1. Load Settings (Already done globally)
-    
-    // 2. Load Conversations
-    const storedConversations = localStorage.getItem('muai_conversations');
-    if (storedConversations) {
-        conversations = JSON.parse(storedConversations);
-        conversations.sort((a, b) => b.updatedAt - a.updatedAt);
-    }
-
-    // 3. Load Active Chat
-    const activeChatId = localStorage.getItem('muai_active_chat_id');
-    if (activeChatId) {
-        currentChatId = activeChatId;
-        const activeChat = conversations.find(c => c.id === currentChatId);
-        if (activeChat) {
-            messages = activeChat.messages;
-        } else {
-            handleNewChat(false); 
-        }
-    } else if (conversations.length > 0) {
-        currentChatId = conversations[0].id;
-        messages = conversations[0].messages;
-        localStorage.setItem('muai_active_chat_id', currentChatId);
-    } else {
-        handleNewChat(false);
-    }
-}
-
-function saveStateToLocalStorage(saveSettingsFlag = true) {
-    if (saveSettingsFlag) {
-        localStorage.setItem('muai_settings', JSON.stringify(settings));
-    }
-    
-    const activeChatIndex = conversations.findIndex(c => c.id === currentChatId);
-    const now = Date.now();
-    
-    // Başlık oluşturma
-    const newTitle = messages.length > 0 ? messages[0].text.substring(0, 50).replace(/(\r\n|\n|\r)/gm, " ").trim() + (messages[0].text.length > 50 ? '...' : '') : "Yeni Sohbet";
-    if (newTitle === "Görsel gönderildi.") {
-        const firstText = messages.find(m => m.text && m.text !== 'Görsel gönderildi.')?.text || "Yeni Sohbet";
-        conversations[activeChatIndex].title = firstText.substring(0, 50).trim() + (firstText.length > 50 ? '...' : '');
-    }
-
-    if (activeChatIndex !== -1) {
-        conversations[activeChatIndex].messages = messages;
-        conversations[activeChatIndex].updatedAt = now;
-        conversations[activeChatIndex].title = newTitle;
-    } else if (messages.length > 0) {
-        const newId = currentChatId || crypto.randomUUID(); 
-        const newChat = {
-            id: newId,
-            title: newTitle,
-            messages: messages,
-            updatedAt: now
-        };
-        conversations.unshift(newChat); 
-        currentChatId = newId;
-        localStorage.setItem('muai_active_chat_id', currentChatId);
-    }
-    
-    conversations.sort((a, b) => b.updatedAt - a.updatedAt);
-    localStorage.setItem('muai_conversations', JSON.stringify(conversations));
-}
-
-// --- UTILITY FUNCTIONS (Audio, Base64, Fetch) ---
-
-/** Converts ArrayBuffer (PCM data) to WAV Blob. */
-function pcmToWav(pcm16, sampleRate) {
-    const buffer = new ArrayBuffer(44 + pcm16.byteLength);
-    const view = new DataView(buffer);
-    const writeString = (view, offset, string) => {
-        for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
-    };
-    let offset = 0;
-    writeString(view, offset, 'RIFF'); offset += 4;
-    view.setUint32(offset, 36 + pcm16.byteLength, true); offset += 4;
-    writeString(view, offset, 'WAVE'); offset += 4;
-    view.setUint32(offset, 16, true); offset += 4;
-    view.setUint16(offset, 1, true); offset += 2;
-    view.setUint16(offset, 1, true); offset += 2;
-    view.setUint32(offset, sampleRate, true); offset += 4;
-    view.setUint32(offset, sampleRate * 2, true); offset += 4;
-    view.setUint16(offset, 2, true); offset += 2;
-    view.setUint16(offset, 16, true); offset += 2;
-    writeString(view, offset, 'data'); offset += 4;
-    view.setUint32(offset, pcm16.byteLength, true); offset += 4;
-    new Int16Array(buffer, offset).set(pcm16);
-    return new Blob([buffer], { type: 'audio/wav' });
-}
-
-/** Converts base64 to ArrayBuffer. */
-function base64ToArrayBuffer(base64) {
-    const binaryString = atob(base64);
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
-    return bytes.buffer;
-}
-
-/** Plays the audio from base64 PCM data. */
-async function playAudio(base64Audio, mimeType) {
-    try {
-        if (!settings.ttsEnabled) return;
-
-        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const rateMatch = mimeType.match(/rate=(\d+)/);
-        const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 16000;
-        const pcmData = base64ToArrayBuffer(base64Audio);
-        const pcm16 = new Int16Array(pcmData);
-        const wavBlob = pcmToWav(pcm16, sampleRate);
-        const audioUrl = URL.createObjectURL(wavBlob);
-        const audio = new Audio(audioUrl);
-        await audio.play();
-        audio.onended = () => { URL.revokeObjectURL(audioUrl); };
-    } catch (error) {
-        console.error("Audio playback error:", error);
-    }
-}
-
-/** Converts File object to base64 for API payload. */
-function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-            const dataUrl = reader.result;
-            const partsArray = dataUrl.split(',');
-            const mimeType = partsArray[0].match(/data:(.*?);/)?.[1];
-            const base64Data = partsArray[1];
-            resolve({
-                mimeType: mimeType,
-                data: base64Data,
-                dataUrl: dataUrl
-            });
-        };
-        reader.onerror = error => reject(error);
-        reader.readAsDataURL(file);
-    });
-}
-
-/** Handles API calls with exponential backoff. */
-async function fetchWithBackoff(url, options, retries = 3) {
-    for (let i = 0; i < retries; i++) {
-        try {
-            const response = await fetch(url, options);
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP error! status: ${response.status}. Details: ${errorText}`);
-            }
-            return response;
-        } catch (error) {
-            // Abort sinyali yakalandıysa, hatayı yukarı atmadan hemen çık
-            if (options.signal && options.signal.aborted) {
-                throw new Error("İşlem kullanıcı tarafından iptal edildi.");
-            }
-            
-            console.warn(`Attempt ${i + 1} failed: ${error.message}`);
-            if (i < retries - 1) {
-                const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
-                await new Promise(resolve => setTimeout(resolve, delay));
-            } else {
-                throw error;
-            }
-        }
-    }
-}
-
-// --- GEMINI INTEGRATION (COMMON) ---
-
-/** Converts chat history to Gemini API format. */
-function historyToContents(history, newUserMessageText, newUserMessageImage) {
-    const contents = [];
-    
-    // 1. Existing History
-    history.forEach(m => {
-        const role = m.type === 'user' ? 'user' : 'model';
-        const parts = [];
-
-        if (m.image && m.type === 'user') {
-            const partsArray = m.image.split(',');
-            const mimeType = partsArray[0].match(/data:(.*?);/)?.[1];
-            const base64Data = partsArray[1];
-            if (mimeType && base64Data) {
-                parts.push({ inlineData: { mimeType, data: base64Data } });
-            }
-        }
-        if (m.text) { parts.push({ text: m.text }); }
-        if (parts.length > 0) { contents.push({ role, parts }); }
-    });
-
-    // 2. Current User Query (Eğer varsa)
-    const newUserParts = [];
-    if (newUserMessageImage) { newUserParts.push({ inlineData: newUserMessageImage }); }
-    if (newUserMessageText) { newUserParts.push({ text: newUserMessageText }); }
-    if (newUserParts.length > 0) { contents.push({ role: 'user', parts: newUserParts }); }
-
-    return contents;
-}
-
-/** * Genel Gemini çağrısı (Sohbet veya Tek Seferlik Sorgular için)
- * @param {AbortSignal} signal - İptal sinyali
- * @param {Array} history - Geçmiş mesajlar (boş olabilir)
- * @param {string} userText - Kullanıcının gönderdiği metin
- * @param {object} userImage - Kullanıcının gönderdiği görsel verisi (inlineData formatında)
- * @param {string} specificInstruction - Yürütülecek özel görev (Özetle, Devamını Yaz, vb.)
- */
-async function generalGeminiCall(signal, history, userText, userImage, specificInstruction = '') {
-    const contents = historyToContents(history, userText, userImage);
-    
-    // Kurucu Bilgisi için özel sistem talimatı
-    const founderInstruction = `Eğer kullanıcı 'Elay Mammadli' veya 'Memmedli' (veya benzeri) hakkında soru sorarsa, TAM OLARAK şu metni yanıtla: 'Kendisi benim kurucumdur ve çok değerli, kıymetli bir kişidir.'`;
-
-    const systemInstructionText = `You are MuAi, a helpful, friendly, and concise multilingual AI assistant. Your primary language of response must be based on the user's selected language code: ${settings.lang}. Maintain context of the conversation. ${specificInstruction} ${founderInstruction} For code generation tasks, ALWAYS enclose the code output within a single markdown code block (e.g., \`\`\`html... \`\`\`). NEVER use special characters like * or / for formatting text, use plain text or markdown code blocks only.`;
-
-
-    const payload = {
-        contents: contents,
-        systemInstruction: {
-            parts: [{ text: systemInstructionText }]
-        }
-    };
-
-    try {
-        const response = await fetchWithBackoff(GEMINI_API_URL + GEMINI_API_KEY, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            signal: signal // İptal sinyalini ekle
-        });
-        
-        const result = await response.json();
-        return result.candidates?.[0]?.content?.parts?.[0]?.text || "Üzgünüm, yanıt alınamadı.";
-    } catch (e) {
-        // İptal durumunu tekrar yakala ve özel hata fırlat
-        if (e.message.includes("kullanıcı tarafından iptal edildi")) {
-             throw new Error("İşlem İptal Edildi");
-        }
-        console.error("Gemini API Error:", e);
-        throw new Error("AI yanıtını alırken bir hata oluştu.");
-    }
-}
-
-/** * JSON Yapılandırılmış Yanıtlar için Gemini çağrısı
- * @param {AbortSignal} signal - İptal sinyali
- * @param {Array} history - Geçmiş mesajlar
- * @param {string} specificInstruction - Yürütülecek özel görev
- * @param {object} schema - Beklenen JSON yapısı
- */
-async function structuredGeminiCall(signal, history, specificInstruction, schema) {
-    const contents = historyToContents(history, null, null);
-
-    const systemInstructionText = `You are MuAi, a helpful, friendly, and concise multilingual AI assistant. Your primary language of response must be based on the user's selected language code: ${settings.lang}. Follow the provided JSON schema exactly. ${specificInstruction}`;
-
-    const payload = {
-        contents: contents,
-        systemInstruction: {
-            parts: [{ text: systemInstructionText }]
-        },
-        generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: schema
-        }
-    };
-
-    try {
-        const response = await fetchWithBackoff(GEMINI_API_URL + GEMINI_API_KEY, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            signal: signal // İptal sinyalini ekle
-        });
-
-        const result = await response.json();
-        const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-        
-        if (jsonText) {
-            return JSON.parse(jsonText);
-        }
-        throw new Error("JSON yanıtı alınamadı veya ayrıştırılamadı.");
-
-    } catch (e) {
-        if (e.message.includes("kullanıcı tarafından iptal edildi")) {
-             throw new Error("İşlem İptal Edildi");
-        }
-        console.error("Structured Gemini API Error:", e);
-        throw new Error("Yapılandırılmış AI yanıtını alırken bir hata oluştu.");
-    }
-}
-
-// --- GEMINI INTEGRATION (TTS) ---
-
-async function callTtsApi(text) {
-    const payload = {
-        contents: [{
-            parts: [{ text: text }]
-        }],
-        generationConfig: {
-            responseModalities: ["AUDIO"],
-            speechConfig: {
-                voiceConfig: {
-                    prebuiltVoiceConfig: { voiceName: settings.voice }
-                }
-            }
-        },
-        model: "gemini-2.5-flash-preview-tts"
-    };
-
-    try {
-        const response = await fetchWithBackoff(TTS_API_URL + GEMINI_API_KEY, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-        const part = result?.candidates?.[0]?.content?.parts?.[0];
-        
-        if (part && part.inlineData && part.inlineData.data && part.inlineData.mimeType) {
-            await playAudio(part.inlineData.data, part.inlineData.mimeType);
-        } else {
-            console.error("TTS API: Audio data missing or malformed.");
-        }
-    } catch (e) {
-        console.error("TTS API Error:", e);
-    }
-}
-
-// --- UI & RENDERING ---
-
-function renderCode(text) {
-    // Markdown code blocklarını bul (```language\ncode\n```)
-    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
-    let match;
-    let htmlContent = '';
-    let lastIndex = 0;
-
-    // Kodu ayrıştırmak için döngü
-    while ((match = codeBlockRegex.exec(text)) !== null) {
-        // Kod bloğu öncesindeki metni ekle
-        htmlContent += `<p>${text.substring(lastIndex, match.index).trim()}</p>`;
-
-        const language = match[1] || 'plaintext';
-        const code = match[2].trim();
-
-        // Kod ve önizleme bileşeni
-        htmlContent += `
-            <div class="bg-gray-100 p-3 rounded-xl mt-3 dark:bg-gray-700">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-xs font-semibold uppercase text-blue-600 dark:text-blue-400">
-                        Kod: ${language.toUpperCase()}
+                
+                <div class="relative">
+                    <button onclick="toggleCartModal(true)" class="p-3 rounded-full hover:opacity-90 transition duration-300 btn-neon" title="Sepetim" style="background-color: var(--accent-color);" data-translate-title="cartButtonTitle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    </button>
+                    <span id="cart-count" class="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold leading-none text-white transform bg-red-600 rounded-full">
+                        0
                     </span>
-                    <button class="copy-code-btn text-xs text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-300 transition duration-150 p-1 rounded" data-code="${encodeURIComponent(code)}">
-                        Kopyala
+                </div>
+
+                
+                <button onclick="toggleSettingsModal()" class="p-3 rounded-full hover:opacity-90 transition duration-300 btn-neon" title="Ayarlar" style="background-color: var(--accent-color);" data-translate-title="settingsButtonTitle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.22a2 2 0 0 1-1.22 1.89L7.2 7.5l-1.42 1.42a2 2 0 0 1-2.83 0L2.5 10.5l1.42 1.42a2 2 0 0 1 0 2.83L7.5 16.8l1.42 1.42a2 2 0 0 1 1.89 1.22V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.22a2 2 0 0 1 1.89-1.22L16.8 16.8l1.42 1.42a2 2 0 0 1 2.83 0L21.5 13.5l-1.42-1.42a2 2 0 0 1 0-2.83L16.5 7.2l-1.42-1.42A2 2 0 0 1 13.5 4.22V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-70 z-[1003] hidden flex items-center justify-center p-4">
+        <div class="card-bg p-8 rounded-xl w-full max-w-sm card-glow border-t-4 border-neon-accent">
+            <h3 class="text-2xl font-bold mb-6 border-b pb-2 neon-accent text-glow" style="border-color: var(--border-color);" data-translate="settingsModalTitle">Arayüz Teması ve Dil</h3>
+            
+            <h4 class="text-lg font-semibold mb-2 neon-accent">Tema Seçimi</h4>
+            <p class="mb-4 text-sm opacity-80" data-translate="settingsModalThemeSubtitle">Markanıza en uygun parlamayı seçin.</p>
+            <div class="space-y-4 mb-8">
+                <button onclick="setTheme('orange')" class="w-full py-3 rounded-lg font-semibold btn-neon" style="background-color: #FF5722;" data-translate="themeOrange">
+                    Turuncu Neon (Dark)
+                </button>
+                <button onclick="setTheme('red')" class="w-full py-3 rounded-lg font-semibold btn-neon" style="background-color: #E91E63;" data-translate="themeRed">
+                    Kırmızı Neon (Dark)
+                </button>
+                <button onclick="setTheme('blue')" class="w-full py-3 rounded-lg font-semibold btn-neon" style="background-color: #00BFFF;" data-translate="themeBlue">
+                    Mavi Neon (Light)
+                </button>
+            </div>
+
+            <h4 class="text-lg font-semibold mb-2 neon-accent border-t pt-4" style="border-color: var(--border-color);" data-translate="settingsModalLangSubtitle">Dil Seçimi</h4>
+            <select id="language-select" onchange="setLanguage(this.value)" class="w-full p-3 rounded-lg border focus:ring-1 focus:ring-neon-accent focus:border-neon-accent mb-4">
+                <option value="tr">Türkçe</option>
+                <option value="en">English</option>
+                <option value="az">Azərbaycanca</option>
+                <option value="ru">Русский</option>
+                <option value="de">Deutsch</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+            </select>
+
+            <button onclick="toggleSettingsModal()" class="mt-6 text-sm underline opacity-70 hover:opacity-100" data-translate="settingsModalClose">Kapat</button>
+        </div>
+    </div>
+    
+    
+    <div id="cart-modal" class="fixed card-bg shadow-2xl overflow-y-auto flex flex-col" style="border-left: 2px solid var(--accent-color);">
+        <div class="p-6 border-b" style="border-color: var(--border-color);">
+            <h3 class="text-3xl font-bold neon-accent text-glow" data-translate="cartTitle">SEPETİM</h3>
+            <button onclick="toggleCartModal(false)" class="absolute top-4 right-4 p-2 rounded-full transition duration-200" style="color: var(--main-text); background-color: var(--primary-bg);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <div id="cart-items-container" class="flex-grow p-6 space-y-4">
+            
+        </div>
+
+        <div class="p-6 border-t card-bg sticky bottom-0" style="border-color: var(--border-color);">
+            <div class="flex justify-between items-center mb-4 text-xl font-bold">
+                <span data-translate="cartTotal">Toplam Fiyat:</span>
+                <span id="cart-total-price" class="neon-accent text-glow">0 $</span>
+            </div>
+            <button onclick="initiateWhatsAppOrder()" id="checkout-button" class="w-full py-3 rounded-lg bg-green-600 text-white font-semibold uppercase tracking-wider hover:bg-green-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed" data-translate="cartCheckoutButton">
+                Siparişi Tamamla (WhatsApp)
+            </button>
+            <button onclick="clearCart()" id="clear-cart-button" class="w-full py-2 mt-2 rounded-lg bg-red-700 text-white text-sm hover:bg-red-800 transition duration-300" data-translate="cartClearButton">
+                Sepeti Boşalt
+            </button>
+        </div>
+    </div>
+
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+
+        
+        <section class="text-center py-16 md:py-24 space-y-4">
+            <h2 class="text-5xl md:text-7xl font-extrabold leading-tight" data-translate="heroTitle">
+                Geleceğin <span class="neon-accent text-glow">Parıltısı</span> Marka Kimliğinizde
+            </h2>
+            <p class="text-lg max-w-2xl mx-auto opacity-80" data-translate="heroSubtitle">
+                Markanızı bir sonraki seviyeye taşıyacak, özel tasarımlı neon ve karanlık temalı logoları keşfedin.
+            </p>
+            <a href="#parali" class="inline-block px-10 py-3 mt-6 rounded-lg bg-neon-accent font-extrabold uppercase tracking-wider btn-neon" data-translate="heroButton">
+                Koleksiyonu İncele
+            </a>
+        </section>
+        
+        
+        <section id="admin-panel" class="hidden my-12 p-6 md:p-10 rounded-xl card-bg card-glow border-t-4 border-neon-accent">
+            <h3 class="text-3xl font-bold mb-6 text-neon-accent text-glow" data-translate="adminPanelTitle">Yönetici: Logo İşlemleri</h3>
+            
+            <h4 class="text-2xl font-semibold mb-4 text-neon-accent" data-translate="adminAddLogoTitle">1. Yeni Logo Ekle</h4>
+            <form id="add-logo-form" onsubmit="addLogo(event)" class="space-y-4 pb-6 border-b" style="border-color: var(--border-color);">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="logo-title" class="block text-sm font-medium neon-accent mb-1" data-translate="adminLogoTitleLabel">Başlık</label>
+                        <input type="text" id="logo-title" required 
+                            class="w-full p-3 rounded-lg border focus:ring-1 focus:ring-neon-accent focus:border-neon-accent" placeholder="Hizmet Adı">
+                    </div>
+                    <div>
+                        <label for="logo-category" class="block text-sm font-medium neon-accent mb-1" data-translate="adminLogoCategoryLabel">Kategori</label>
+                        <select id="logo-category" required 
+                            class="w-full p-3 rounded-lg border focus:ring-1 focus:ring-neon-accent focus:border-neon-accent">
+                            <option value="parali" data-translate="adminLogoPaidOption">Ücretli (Premium)</option>
+                            <option value="ucretsiz" data-translate="adminLogoFreeOption">Ücretsiz</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label for="logo-price" class="block text-sm font-medium neon-accent mb-1" data-translate="adminLogoPriceLabel">Fiyat ($)</label>
+                    <input type="number" id="logo-price" required min="0" value="0"
+                        class="w-full p-3 rounded-lg border focus:ring-1 focus:ring-neon-accent focus:border-neon-accent">
+                </div>
+
+                
+                <div>
+                    <label for="logo-image-file" class="block text-sm font-medium neon-accent mb-1" data-translate="adminLogoImageLabel">Logo Resmi (JPEG/PNG)</label>
+                    <input type="file" id="logo-image-file" accept="image/jpeg, image/png" required
+                        class="w-full p-3 rounded-lg border focus:ring-1 focus:ring-neon-accent focus:border-neon-accent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-neon-accent file:text-black hover:file:bg-opacity-80">
+                    <p id="file-error" class="text-red-400 text-sm mt-1 hidden" data-translate="adminFileError">Lütfen bir resim dosyası seçin.</p>
+                </div>
+                
+                <button type="submit" class="w-full py-3 mt-4 rounded-lg bg-neon-accent font-semibold uppercase tracking-wider btn-neon" data-translate="adminLogoSaveButton">
+                    Logoyu Kaydet
+                </button>
+            </form>
+            
+            <p id="admin-message" class="mt-4 p-3 rounded-lg text-center text-sm hidden" role="alert"></p>
+
+
+            
+            <div class="mt-12 pt-4">
+                <h4 class="text-2xl font-semibold mb-4 text-red-400" data-translate="adminDeleteLogoTitle">2. Logoları Yönet ve Sil</h4>
+                <p class="mb-4 opacity-80 text-sm" data-translate="adminDeleteLogoSubtitle">Aşağıdaki listeden mevcut logoları kalıcı olarak silebilirsiniz.</p>
+                <div id="admin-logo-list" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                    <!-- Yönetici Logo Listesi Buraya Render Edilecek -->
+                </div>
+            </div>
+            
+        </section>
+
+        
+        <div id="logo-sections" class="space-y-20 pt-10">
+
+            
+            <section id="parali">
+                <h3 class="text-4xl font-bold mb-8 border-l-4 pl-4 border-neon-accent" style="color: var(--main-text);" data-translate="premiumLogosTitle">
+                    <span class="neon-accent text-glow">PREMIUM</span> Logolar
+                </h3>
+                <p class="mb-8 opacity-80" data-translate="premiumLogosSubtitle">Profesyonel kalitede, tek kullanımlık ve özel tasarım garantili logolar.</p>
+                <div id="parali-logos" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                    
+                </div>
+            </section>
+
+            
+            <section id="ucretsiz" class="pt-10">
+                <h3 class="text-4xl font-bold mb-8 border-l-4 pl-4 border-neon-accent" style="color: var(--main-text);" data-translate="freeLogosTitle">
+                    <span class="neon-accent text-glow">ÜCRETSİZ</span> Logolar
+                </h3>
+                <p class="mb-8 opacity-80" data-translate="freeLogosSubtitle">Proje başlangıçları için kullanabileceğiniz yüksek çözünürlüklü, telifsiz tasarımlar.</p>
+                <div id="ucretsiz-logos" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                    
+                </div>
+            </section>
+
+            
+            <section id="kendi-istegi" class="pt-10">
+                <h3 class="text-4xl font-bold mb-8 border-l-4 pl-4 border-neon-accent" style="color: var(--main-text);" data-translate="customRequestTitle">
+                    <span class="neon-accent text-glow">ÖZEL</span> Logo Tasarımı
+                </h3>
+                
+                <div class="card-bg p-6 md:p-10 rounded-xl card-glow max-w-3xl mx-auto border-t-2 border-neon-accent">
+                    <p class="mb-6 text-center opacity-90" data-translate="customRequestSubtitle">
+                        Hayalinizdeki logoyu anlatın. Sadece size özel, sıfırdan bir tasarım için formu doldurup **WhatsApp** üzerinden bize ulaşın. (Numara: +994 70-784-14-14)
+                    </p>
+                    
+                    <form onsubmit="handleCustomRequest(event)" class="space-y-4">
+                        <div>
+                            <label for="custom-name" class="block text-sm font-medium neon-accent mb-1" data-translate="customNameLabel">Adınız / Şirket Adınız</label>
+                            <input type="text" id="custom-name" name="name" required
+                                class="w-full p-3 rounded-lg border focus:ring-1 focus:ring-neon-accent focus:border-neon-accent">
+                        </div>
+                        <div>
+                            <label for="custom-message" class="block text-sm font-medium neon-accent mb-1" data-translate="customMessageLabel">Logo İstek Detayları</label>
+                            <textarea id="custom-message" name="message" rows="5" required
+                                class="w-full p-3 rounded-lg border focus:ring-1 focus:ring-neon-accent focus:border-neon-accent"
+                                data-translate-placeholder="customMessagePlaceholder" placeholder="Örnek: Karanlık bir uzay teması istiyorum. Ana renk turuncu ve mor. Bir oyun stüdyosu için olacak."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="w-full py-3 mt-4 rounded-lg bg-green-600 text-white font-semibold uppercase tracking-wider hover:bg-green-700 transition duration-300" data-translate="customSubmitButton">
+                            WhatsApp'tan İlet
+                        </button>
+                    </form>
+
+                    
+                    <div id="request-message" class="mt-6 p-4 rounded-lg text-center hidden card-glow" role="alert"></div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    
+    <footer class="mt-20 p-6 border-t text-center text-sm flex justify-center items-center relative" 
+            style="border-color: var(--border-color); color: var(--main-text); opacity: 0.6;">
+        <p>
+            &copy; 2024 LOGOVERS. 
+            <span data-translate="footerText">Tüm Hakları Saklıdır.</span> | 
+            <span data-translate="whatsappSupport">WhatsApp Destek:</span> (+994) 70-784-14-14
+        </p>
+        
+        
+        <span onclick="toggleAdminLoginBox()" class="admin-trigger absolute right-4 font-bold tracking-widest text-xs">
+            ADM
+        </span>
+    </footer>
+
+    
+    <div id="admin-login-box" class="fixed card-bg rounded-t-xl admin-hidden shadow-2xl">
+        <h4 class="text-center font-bold text-lg neon-accent text-glow" data-translate="adminLoginTitle">YÖNETİCİ GİRİŞİ</h4>
+        <form id="admin-login-form" onsubmit="handleAdminLogin(event)" class="space-y-2 mt-2">
+            <input type="password" id="admin-password" data-translate-placeholder="adminPasswordPlaceholder" placeholder="Şifre" required
+                class="w-full p-2 rounded-lg border focus:ring-1 focus:ring-neon-accent focus:border-neon-accent">
+            <button type="submit" class="w-full py-1.5 rounded-lg bg-neon-accent font-semibold btn-neon" data-translate="adminLoginButton">
+                Giriş Yap
+            </button>
+        </form>
+        <button type="button" onclick="handleAdminLogout()" id="admin-logout-btn" class="w-full py-1.5 rounded-lg bg-red-800 text-white font-semibold mt-2 hover:bg-red-600 transition duration-300 hidden" data-translate="adminLogoutButton">
+            Çıkış Yap
+        </button>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = "1975";
+        const LOGOS_STORAGE_KEY = 'logo_store_logos_v2'; 
+        const CART_STORAGE_KEY = 'logo_store_cart_v2';
+        const THEME_STORAGE_KEY = 'logo_store_theme_v2';
+        const LANG_STORAGE_KEY = 'logo_store_lang_v3'; // Yeni dil anahtarı
+        const WHATSAPP_NUMBER = '994707841414'; 
+        const CURRENCY_SYMBOL = '$'; 
+        let currentLang = 'tr';
+
+        // ==========================================================
+        // DİL VE TERCÜME VERİLERİ
+        // ==========================================================
+        const translations = {
+            tr: {
+                // Genel
+                appTitle: 'LOGOVERS: Özel Neon ve Dark Logo Tasarımları',
+                headerNavPaid: 'Ücretli', headerNavFree: 'Ücretsiz', headerNavCustom: 'Özel İstek', headerNavAdmin: 'Yönetici Paneli',
+                cartButtonTitle: 'Sepetim', settingsButtonTitle: 'Ayarlar', footerText: 'Tüm Hakları Saklıdır.', whatsappSupport: 'WhatsApp Destek:',
+                heroTitle: 'Geleceğin Parıltısı Marka Kimliğinizde', heroSubtitle: 'Markanızı bir sonraki seviyeye taşıyacak, özel tasarımlı neon ve karanlık temalı logoları keşfedin.', heroButton: 'Koleksiyonu İncele',
+                addToCartButton: 'Sepete Ekle', priceFree: 'ÜCRETSİZ',
+                // Ayarlar
+                settingsModalTitle: 'Arayüz Teması ve Dil', settingsModalThemeSubtitle: 'Markanıza en uygun parlamayı seçin.',
+                themeOrange: 'Turuncu Neon (Dark)', themeRed: 'Kırmızı Neon (Dark)', themeBlue: 'Mavi Neon (Light)',
+                settingsModalLangSubtitle: 'Dil Seçimi', settingsModalClose: 'Kapat',
+                // Sepet
+                cartTitle: 'SEPETİM', cartTotal: 'Toplam Fiyat:', cartCheckoutButton: `Siparişi Tamamla (WhatsApp)`, cartClearButton: 'Sepeti Boşalt', cartEmpty: 'Sepetinizde ürün bulunmamaktadır.',
+                // Özel İstek
+                customRequestTitle: 'ÖZEL Logo Tasarımı', 
+                customRequestSubtitle: 'Hayalinizdeki logoyu anlatın. Sadece size özel, sıfırdan bir tasarım için formu doldurup **WhatsApp** üzerinden bize ulaşın. (Numara: +994 70-784-14-14)',
+                customNameLabel: 'Adınız / Şirket Adınız', customMessageLabel: 'Logo İstek Detayları', customSubmitButton: "WhatsApp'tan İlet",
+                customMessagePlaceholder: 'Örnek: Karanlık bir uzay teması istiyorum. Ana renk turuncu ve mor. Bir oyun stüdyosu için olacak.',
+                // Yönetici
+                adminLoginTitle: 'YÖNETİCİ GİRİŞİ', adminPasswordPlaceholder: 'Şifre', adminLoginButton: 'Giriş Yap', adminLogoutButton: 'Çıkış Yap',
+                adminPanelTitle: 'Yönetici: Logo İşlemleri', adminAddLogoTitle: '1. Yeni Logo Ekle', adminLogoTitleLabel: 'Başlık', adminLogoCategoryLabel: 'Kategori',
+                adminLogoPaidOption: 'Ücretli (Premium)', adminLogoFreeOption: 'Ücretsiz', adminLogoPriceLabel: `Fiyat (${CURRENCY_SYMBOL})`, adminLogoImageLabel: 'Logo Resmi (JPEG/PNG)', adminLogoSaveButton: 'Logoyu Kaydet',
+                adminFileError: 'Lütfen bir resim dosyası seçin.',
+                adminDeleteLogoTitle: '2. Logoları Yönet ve Sil', adminDeleteLogoSubtitle: 'Aşağıdaki listeden mevcut logoları kalıcı olarak silebilirsiniz.',
+                // Kategoriler
+                premiumLogosTitle: `<span class="neon-accent text-glow">PREMIUM</span> Logolar`, premiumLogosSubtitle: 'Profesyonel kalitede, tek kullanımlık ve özel tasarım garantili logolar.',
+                freeLogosTitle: `<span class="neon-accent text-glow">ÜCRETSİZ</span> Logolar`, freeLogosSubtitle: 'Proje başlangıçları için kullanabileceğiniz yüksek çözünürlüklü, telifsiz tasarımlar.',
+                // Mesajlar
+                msgLogoAdded: (title) => `Logo "${title}" başarıyla eklendi!`, msgLogoSaved: 'Logoyu Kaydet', msgLogoDeleted: 'Logo başarıyla silindi!',
+                msgAdminLoginSuccess: 'Yönetici girişi başarılı!', msgAdminLoginFailed: 'Hatalı şifre. Tekrar deneyin.', msgAdminLogout: 'Yönetici çıkışı yapıldı.',
+                msgCartAdded: (title) => `"${title}" sepete eklendi!`, msgOrderReady: 'Siparişiniz hazırlandı ve WhatsApp\'a yönlendiriliyorsunuz.', msgCartCleared: 'Sepetiniz başarıyla temizlendi.',
+                msgFillAllFields: 'Lütfen tüm alanları doldurunuz.', msgFileReadError: 'Dosya okuma hatası oluştu.', msgLogoNotFound: 'Logo bulunamadı veya silinirken hata oluştu.',
+                whatsAppBaseMessage: 'Lütfen siparişimle ilgili bana ulaşın. Numara: (+994) 70-784-14-14'
+            },
+            en: {
+                // General
+                appTitle: 'LOGOVERS: Custom Neon and Dark Logo Designs',
+                headerNavPaid: 'Paid', headerNavFree: 'Free', headerNavCustom: 'Custom Request', headerNavAdmin: 'Admin Panel',
+                cartButtonTitle: 'My Cart', settingsButtonTitle: 'Settings', footerText: 'All Rights Reserved.', whatsappSupport: 'WhatsApp Support:',
+                heroTitle: "The Future's Glow in Your Brand Identity", heroSubtitle: 'Discover custom-designed neon and dark-themed logos that will take your brand to the next level.', heroButton: 'Explore Collection',
+                addToCartButton: 'Add to Cart', priceFree: 'FREE',
+                // Settings
+                settingsModalTitle: 'Interface Theme and Language', settingsModalThemeSubtitle: 'Choose the glow that best suits your brand.',
+                themeOrange: 'Orange Neon (Dark)', themeRed: 'Red Neon (Dark)', themeBlue: 'Blue Neon (Light)',
+                settingsModalLangSubtitle: 'Language Selection', settingsModalClose: 'Close',
+                // Cart
+                cartTitle: 'MY CART', cartTotal: 'Total Price:', cartCheckoutButton: `Complete Order (WhatsApp)`, cartClearButton: 'Empty Cart', cartEmpty: 'Your cart is empty.',
+                // Custom Request
+                customRequestTitle: 'CUSTOM Logo Design', 
+                customRequestSubtitle: 'Tell us about your dream logo. Fill out the form and contact us via **WhatsApp** for a custom, scratch-made design just for you. (Number: +994 70-784-14-14)',
+                customNameLabel: 'Your Name / Company Name', customMessageLabel: 'Logo Request Details', customSubmitButton: 'Send via WhatsApp',
+                customMessagePlaceholder: 'Example: I want a dark space theme. Main colors orange and purple. It will be for a game studio.',
+                // Admin
+                adminLoginTitle: 'ADMIN LOGIN', adminPasswordPlaceholder: 'Password', adminLoginButton: 'Log In', adminLogoutButton: 'Log Out',
+                adminPanelTitle: 'Admin: Logo Management', adminAddLogoTitle: '1. Add New Logo', adminLogoTitleLabel: 'Title', adminLogoCategoryLabel: 'Category',
+                adminLogoPaidOption: 'Paid (Premium)', adminLogoFreeOption: 'Free', adminLogoPriceLabel: `Price (${CURRENCY_SYMBOL})`, adminLogoImageLabel: 'Logo Image (JPEG/PNG)', adminLogoSaveButton: 'Save Logo',
+                adminFileError: 'Please select an image file.',
+                adminDeleteLogoTitle: '2. Manage and Delete Logos', adminDeleteLogoSubtitle: 'You can permanently delete existing logos from the list below.',
+                // Categories
+                premiumLogosTitle: `<span class="neon-accent text-glow">PREMIUM</span> Logos`, premiumLogosSubtitle: 'Professional quality, single-use, and guaranteed custom design logos.',
+                freeLogosTitle: `<span class="neon-accent text-glow">FREE</span> Logos`, freeLogosSubtitle: 'High-resolution, royalty-free designs you can use for project starts.',
+                // Messages
+                msgLogoAdded: (title) => `Logo "${title}" successfully added!`, msgLogoSaved: 'Save Logo', msgLogoDeleted: 'Logo successfully deleted!',
+                msgAdminLoginSuccess: 'Admin login successful!', msgAdminLoginFailed: 'Incorrect password. Try again.', msgAdminLogout: 'Admin logged out.',
+                msgCartAdded: (title) => `"${title}" added to cart!`, msgOrderReady: 'Your order is ready and you are being redirected to WhatsApp.', msgCartCleared: 'Your cart has been successfully cleared.',
+                msgFillAllFields: 'Please fill in all fields.', msgFileReadError: 'File reading error occurred.', msgLogoNotFound: 'Logo not found or error during deletion.',
+                whatsAppBaseMessage: 'Please contact me regarding my order. Number: (+994) 70-784-14-14'
+            },
+            az: {
+                // General
+                appTitle: 'LOGOVERS: Xüsusi Neon və Tünd Loqo Dizaynları',
+                headerNavPaid: 'Ödənişli', headerNavFree: 'Pulsuz', headerNavCustom: 'Xüsusi İstək', headerNavAdmin: 'Admin Paneli',
+                cartButtonTitle: 'Səbətim', settingsButtonTitle: 'Ayarlar', footerText: 'Bütün Hüquqlar Qorunur.', whatsappSupport: 'WhatsApp Dəstək:',
+                heroTitle: 'Gələcəyin Parıltısı Marka Kimliyinizdə', heroSubtitle: 'Markanızı növbəti səviyyəyə qaldıracaq, xüsusi dizaynlı neon və qaranlıq temalı loqoları kəşf edin.', heroButton: 'Kolleksiyaya Bax',
+                addToCartButton: 'Səbətə əlavə et', priceFree: 'PULSUZ',
+                // Settings
+                settingsModalTitle: 'İnterfeys Teması və Dil', settingsModalThemeSubtitle: 'Brendinizə ən uyğun parıltını seçin.',
+                themeOrange: 'Narıncı Neon (Dark)', themeRed: 'Qırmızı Neon (Dark)', themeBlue: 'Mavi Neon (Light)',
+                settingsModalLangSubtitle: 'Dil Seçimi', settingsModalClose: 'Bağla',
+                // Cart
+                cartTitle: 'SƏBƏTİM', cartTotal: 'Ümumi Qiymət:', cartCheckoutButton: `Sifarişi tamamla (WhatsApp)`, cartClearButton: 'Səbəti boşalt', cartEmpty: 'Səbətinizdə məhsul yoxdur.',
+                // Custom Request
+                customRequestTitle: 'XÜSUSİ Loqo Dizaynı', 
+                customRequestSubtitle: 'Xəyalınızdakı loqonu bizə danışın. Yalnız sizin üçün, sıfırdan bir dizayn üçün formu doldurub **WhatsApp** üzərindən bizimlə əlaqə saxlayın. (Nömrə: +994 70-784-14-14)',
+                customNameLabel: 'Adınız / Şirkət Adınız', customMessageLabel: 'Loqo İstəyi Detalları', customSubmitButton: 'WhatsApp-dan Göndər',
+                customMessagePlaceholder: 'Nümunə: Qaranlıq kosmos mövzusu istəyirəm. Əsas rənglər narıncı və bənövşəyi. Bir oyun studiyası üçün olacaq.',
+                // Admin
+                adminLoginTitle: 'İNZİBATÇI GİRİŞİ', adminPasswordPlaceholder: 'Şifrə', adminLoginButton: 'Daxil ol', adminLogoutButton: 'Çıxış et',
+                adminPanelTitle: 'İnzibatçı: Loqo Əməliyyatları', adminAddLogoTitle: '1. Yeni Loqo Əlavə Et', adminLogoTitleLabel: 'Başlıq', adminLogoCategoryLabel: 'Kateqoriya',
+                adminLogoPaidOption: 'Ödənişli (Premium)', adminLogoFreeOption: 'Pulsuz', adminLogoPriceLabel: `Qiymət (${CURRENCY_SYMBOL})`, adminLogoImageLabel: 'Loqo Şəkli (JPEG/PNG)', adminLogoSaveButton: 'Loqonu Yadda Saxla',
+                adminFileError: 'Zəhmət olmasa, şəkil faylı seçin.',
+                adminDeleteLogoTitle: '2. Loqoları İdarə et və Sil', adminDeleteLogoSubtitle: 'Aşağıdakı siyahıdan mövcud loqoları birdəfəlik silə bilərsiniz.',
+                // Kategoriler
+                premiumLogosTitle: `<span class="neon-accent text-glow">PREMIUM</span> Loqolar`, premiumLogosSubtitle: 'Peşəkar keyfiyyətli, birdəfəlik və xüsusi dizayn zəmanətli loqolar.',
+                freeLogosTitle: `<span class="neon-accent text-glow">PULSUZ</span> Loqolar`, freeLogosSubtitle: 'Layihə başlanğıcları üçün istifadə edə biləcəyiniz yüksək keyfiyyətli, telifsiz dizaynlar.',
+                // Messages
+                msgLogoAdded: (title) => `Loqo "${title}" uğurla əlavə edildi!`, msgLogoSaved: 'Loqonu Yadda Saxla', msgLogoDeleted: 'Loqo uğurla silindi!',
+                msgAdminLoginSuccess: 'İnzibatçı girişi uğurlu!', msgAdminLoginFailed: 'Yanlış şifrə. Yenidən cəhd edin.', msgAdminLogout: 'İnzibatçı çıxışı edildi.',
+                msgCartAdded: (title) => `"${title}" səbətə əlavə edildi!`, msgOrderReady: 'Sifarişiniz hazırlanıb və WhatsApp-a yönləndirilirsiniz.', msgCartCleared: 'Səbətiniz uğurla təmizləndi.',
+                msgFillAllFields: 'Zəhmət olmasa, bütün sahələri doldurun.', msgFileReadError: 'Fayl oxuma xətası baş verdi.', msgLogoNotFound: 'Loqo tapılmadı və ya silinmə zamanı xəta oldu.',
+                whatsAppBaseMessage: 'Zəhmət olmasa, sifarişimlə bağlı mənimlə əlaqə saxlayın. Nömrə: (+994) 70-784-14-14'
+            },
+            ru: {
+                // General
+                appTitle: 'LOGOVERS: Неоновый и Темный Дизайн Логотипов',
+                headerNavPaid: 'Платные', headerNavFree: 'Бесплатные', headerNavCustom: 'Индивидуальный заказ', headerNavAdmin: 'Панель администратора',
+                cartButtonTitle: 'Корзина', settingsButtonTitle: 'Настройки', footerText: 'Все права защищены.', whatsappSupport: 'Поддержка WhatsApp:',
+                heroTitle: 'Сияние будущего в вашей идентичности бренда', heroSubtitle: 'Откройте для себя неоновые и темные логотипы, которые поднимут ваш бренд на новый уровень.', heroButton: 'Изучить коллекцию',
+                addToCartButton: 'Добавить в корзину', priceFree: 'БЕСПЛАТНО',
+                // Settings
+                settingsModalTitle: 'Тема интерфейса и язык', settingsModalThemeSubtitle: 'Выберите сияние, которое лучше всего подходит вашему бренду.',
+                themeOrange: 'Оранжевый неон (Dark)', themeRed: 'Красный неон (Dark)', themeBlue: 'Синий неон (Light)',
+                settingsModalLangSubtitle: 'Выбор языка', settingsModalClose: 'Закрыть',
+                // Cart
+                cartTitle: 'КОРЗИНА', cartTotal: 'Общая цена:', cartCheckoutButton: `Завершить заказ (WhatsApp)`, cartClearButton: 'Очистить корзину', cartEmpty: 'Ваша корзина пуста.',
+                // Custom Request
+                customRequestTitle: 'ИНДИВИДУАЛЬНЫЙ Дизайн Логотипа', 
+                customRequestSubtitle: 'Расскажите нам о логотипе вашей мечты. Заполните форму и свяжитесь с нами через **WhatsApp** для индивидуального дизайна, созданного с нуля специально для вас. (Номер: +994 70-784-14-14)',
+                customNameLabel: 'Ваше имя / Название компании', customMessageLabel: 'Детали запроса логотипа', customSubmitButton: 'Отправить через WhatsApp',
+                customMessagePlaceholder: 'Пример: Я хочу темную космическую тему. Основные цвета оранжевый и фиолетовый. Это будет для игровой студии.',
+                // Admin
+                adminLoginTitle: 'ВХОД АДМИНИСТРАТОРА', adminPasswordPlaceholder: 'Пароль', adminLoginButton: 'Войти', adminLogoutButton: 'Выйти',
+                adminPanelTitle: 'Админ: Управление логотипами', adminAddLogoTitle: '1. Добавить новый логотип', adminLogoTitleLabel: 'Название', adminLogoCategoryLabel: 'Категория',
+                adminLogoPaidOption: 'Платный (Premium)', adminLogoFreeOption: 'Бесплатный', adminLogoPriceLabel: `Цена (${CURRENCY_SYMBOL})`, adminLogoImageLabel: 'Изображение логотипа (JPEG/PNG)', adminLogoSaveButton: 'Сохранить логотип',
+                adminFileError: 'Пожалуйста, выберите файл изображения.',
+                adminDeleteLogoTitle: '2. Управление и удаление логотипов', adminDeleteLogoSubtitle: 'Вы можете навсегда удалить существующие логотипы из списка ниже.',
+                // Kategoriler
+                premiumLogosTitle: `<span class="neon-accent text-glow">PREMIUM</span> Логотипы`, premiumLogosSubtitle: 'Профессиональное качество, одноразовые и гарантированно индивидуальные дизайнерские логотипы.',
+                freeLogosTitle: `<span class="neon-accent text-glow">БЕСПЛАТНЫЕ</span> Логотипы`, freeLogosSubtitle: 'Высококачественные, безвозмездные дизайны, которые вы можете использовать для запуска проектов.',
+                // Messages
+                msgLogoAdded: (title) => `Логотип "${title}" успешно добавлен!`, msgLogoSaved: 'Сохранить логотип', msgLogoDeleted: 'Логотип успешно удален!',
+                msgAdminLoginSuccess: 'Вход администратора успешен!', msgAdminLoginFailed: 'Неверный пароль. Попробуйте снова.', msgAdminLogout: 'Выход администратора выполнен.',
+                msgCartAdded: (title) => `"${title}" добавлен в корзину!`, msgOrderReady: 'Ваш заказ готов, и вы перенаправляетесь в WhatsApp.', msgCartCleared: 'Ваша корзина успешно очищена.',
+                msgFillAllFields: 'Пожалуйста, заполните все поля.', msgFileReadError: 'Произошла ошибка чтения файла.', msgLogoNotFound: 'Логотип не найден или произошла ошибка при удалении.',
+                whatsAppBaseMessage: 'Пожалуйста, свяжитесь со мной по поводу моего заказа. Номер: (+994) 70-784-14-14'
+            },
+            de: {
+                // General
+                appTitle: 'LOGOVERS: Spezielle Neon- und Dark-Logo-Designs',
+                headerNavPaid: 'Bezahlte', headerNavFree: 'Kostenlose', headerNavCustom: 'Sonderwunsch', headerNavAdmin: 'Admin-Panel',
+                cartButtonTitle: 'Mein Warenkorb', settingsButtonTitle: 'Einstellungen', footerText: 'Alle Rechte vorbehalten.', whatsappSupport: 'WhatsApp Support:',
+                heroTitle: 'Der Glanz der Zukunft in Ihrer Markenidentität', heroSubtitle: 'Entdecken Sie individuell gestaltete Neon- und Dark-Logos, die Ihre Marke auf die nächste Stufe heben.', heroButton: 'Kollektion erkunden',
+                addToCartButton: 'Zum Warenkorb hinzufügen', priceFree: 'KOSTENLOS',
+                // Settings
+                settingsModalTitle: 'Oberflächenthema und Sprache', settingsModalThemeSubtitle: 'Wählen Sie den Glanz, der am besten zu Ihrer Marke passt.',
+                themeOrange: 'Oranges Neon (Dunkel)', themeRed: 'Rotes Neon (Dunkel)', themeBlue: 'Blaues Neon (Hell)',
+                settingsModalLangSubtitle: 'Sprachauswahl', settingsModalClose: 'Schließen',
+                // Cart
+                cartTitle: 'MEIN WARENKORB', cartTotal: 'Gesamtpreis:', cartCheckoutButton: `Bestellung abschließen (WhatsApp)`, cartClearButton: 'Warenkorb leeren', cartEmpty: 'Ihr Warenkorb ist leer.',
+                // Custom Request
+                customRequestTitle: 'INDIVIDUELLES Logo-Design', 
+                customRequestSubtitle: 'Beschreiben Sie Ihr Traum-Logo. Füllen Sie das Formular aus und kontaktieren Sie uns über **WhatsApp** für ein individuelles, von Grund auf neu erstelltes Design. (Nummer: +994 70-784-14-14)',
+                customNameLabel: 'Ihr Name / Firmenname', customMessageLabel: 'Details zur Logoanfrage', customSubmitButton: 'Über WhatsApp senden',
+                customMessagePlaceholder: 'Beispiel: Ich möchte ein dunkles Weltraumthema. Hauptfarben Orange und Lila. Es soll für ein Spielestudio sein.',
+                // Admin
+                adminLoginTitle: 'ADMIN-ANMELDUNG', adminPasswordPlaceholder: 'Passwort', adminLoginButton: 'Anmelden', adminLogoutButton: 'Abmelden',
+                adminPanelTitle: 'Admin: Logo-Verwaltung', adminAddLogoTitle: '1. Neues Logo hinzufügen', adminLogoTitleLabel: 'Titel', adminLogoCategoryLabel: 'Kategorie',
+                adminLogoPaidOption: 'Bezahlte (Premium)', adminLogoFreeOption: 'Kostenlos', adminLogoPriceLabel: `Preis (${CURRENCY_SYMBOL})`, adminLogoImageLabel: 'Logo-Bild (JPEG/PNG)', adminLogoSaveButton: 'Logo speichern',
+                adminFileError: 'Bitte wählen Sie eine Bilddatei aus.',
+                adminDeleteLogoTitle: '2. Logos verwalten und löschen', adminDeleteLogoSubtitle: 'Sie können vorhandene Logos dauerhaft aus der Liste unten löschen.',
+                // Kategoriler
+                premiumLogosTitle: `<span class="neon-accent text-glow">PREMIUM</span> Logos`, premiumLogosSubtitle: 'Professionelle Qualität, einmalige und garantierte individuelle Design-Logos.',
+                freeLogosTitle: `<span class="neon-accent text-glow">KOSTENLOSE</span> Logos`, freeLogosSubtitle: 'Hochauflösende, lizenzfreie Designs, die Sie für den Projektstart verwenden können.',
+                // Messages
+                msgLogoAdded: (title) => `Logo "${title}" erfolgreich hinzugefügt!`, msgLogoSaved: 'Logo speichern', msgLogoDeleted: 'Logo erfolgreich gelöscht!',
+                msgAdminLoginSuccess: 'Admin-Login erfolgreich!', msgAdminLoginFailed: 'Falsches Passwort. Versuchen Sie es erneut.', msgAdminLogout: 'Admin abgemeldet.',
+                msgCartAdded: (title) => `"${title}" zum Warenkorb hinzugefügt!`, msgOrderReady: 'Ihre Bestellung ist fertig und Sie werden zu WhatsApp weitergeleitet.', msgCartCleared: 'Ihr Warenkorb wurde erfolgreich geleert.',
+                msgFillAllFields: 'Bitte füllen Sie alle Felder aus.', msgFileReadError: 'Dateilesefehler aufgetreten.', msgLogoNotFound: 'Logo nicht gefunden oder Fehler beim Löschen.',
+                whatsAppBaseMessage: 'Bitte kontaktieren Sie mich bezüglich meiner Bestellung. Nummer: (+994) 70-784-14-14'
+            },
+            es: {
+                // General
+                appTitle: 'LOGOVERS: Diseños de Logotipos de Neón y Oscuros',
+                headerNavPaid: 'Pagados', headerNavFree: 'Gratuitos', headerNavCustom: 'Solicitud personalizada', headerNavAdmin: 'Panel de administrador',
+                cartButtonTitle: 'Mi Carrito', settingsButtonTitle: 'Ajustes', footerText: 'Todos los derechos reservados.', whatsappSupport: 'Soporte de WhatsApp:',
+                heroTitle: 'El Resplandor del Futuro en tu Identidad de Marca', heroSubtitle: 'Descubre logotipos de neón y temáticos oscuros diseñados a medida que llevarán tu marca al siguiente nivel.', heroButton: 'Explorar colección',
+                addToCartButton: 'Añadir al carrito', priceFree: 'GRATIS',
+                // Settings
+                settingsModalTitle: 'Tema e idioma de la interfaz', settingsModalThemeSubtitle: 'Elige el brillo que mejor se adapte a tu marca.',
+                themeOrange: 'Neón Naranja (Oscuro)', themeRed: 'Neón Rojo (Oscuro)', themeBlue: 'Neón Azul (Claro)',
+                settingsModalLangSubtitle: 'Selección de idioma', settingsModalClose: 'Cerrar',
+                // Cart
+                cartTitle: 'MI CARRITO', cartTotal: 'Precio Total:', cartCheckoutButton: `Completar Pedido (WhatsApp)`, cartClearButton: 'Vaciar Carrito', cartEmpty: 'Tu carrito está vacío.',
+                // Custom Request
+                customRequestTitle: 'Diseño de Logotipo PERSONALIZADO', 
+                customRequestSubtitle: 'Háblanos sobre el logo de tus sueños. Rellena el formulario y contáctanos por **WhatsApp** para un diseño personalizado, hecho desde cero solo para ti. (Número: +994 70-784-14-14)',
+                customNameLabel: 'Tu Nombre / Nombre de la Empresa', customMessageLabel: 'Detalles de la Solicitud de Logo', customSubmitButton: 'Enviar por WhatsApp',
+                customMessagePlaceholder: 'Ejemplo: Quiero un tema espacial oscuro. Colores principales naranja y morado. Será para un estudio de juegos.',
+                // Admin
+                adminLoginTitle: 'INICIO DE SESIÓN DE ADMINISTRADOR', adminPasswordPlaceholder: 'Contraseña', adminLoginButton: 'Iniciar Sesión', adminLogoutButton: 'Cerrar Sesión',
+                adminPanelTitle: 'Admin: Gestión de Logotipos', adminAddLogoTitle: '1. Agregar Nuevo Logotipo', adminLogoTitleLabel: 'Título', adminLogoCategoryLabel: 'Categoría',
+                adminLogoPaidOption: 'Pagado (Premium)', adminLogoFreeOption: 'Gratis', adminLogoPriceLabel: `Precio (${CURRENCY_SYMBOL})`, adminLogoImageLabel: 'Imagen del Logo (JPEG/PNG)', adminLogoSaveButton: 'Guardar Logotipo',
+                adminFileError: 'Por favor, seleccione un archivo de imagen.',
+                adminDeleteLogoTitle: '2. Administrar y Eliminar Logotipos', adminDeleteLogoSubtitle: 'Puede eliminar permanentemente los logotipos existentes de la lista a continuación.',
+                // Kategoriler
+                premiumLogosTitle: `<span class="neon-accent text-glow">PREMIUM</span> Logotipos`, premiumLogosSubtitle: 'Logotipos de calidad profesional, de un solo uso y con diseño personalizado garantizado.',
+                freeLogosTitle: `<span class="neon-accent text-glow">GRATUITOS</span> Logotipos`, freeLogosSubtitle: 'Diseños de alta resolución y libres de regalías que puedes usar para iniciar proyectos.',
+                // Messages
+                msgLogoAdded: (title) => `¡Logotipo "${title}" agregado exitosamente!`, msgLogoSaved: 'Guardar Logotipo', msgLogoDeleted: '¡Logotipo eliminado exitosamente!',
+                msgAdminLoginSuccess: '¡Inicio de sesión de administrador exitoso!', msgAdminLoginFailed: 'Contraseña incorrecta. Inténtalo de nuevo.', msgAdminLogout: 'Sesión de administrador cerrada.',
+                msgCartAdded: (title) => `¡"${title}" añadido al carrito!`, msgOrderReady: 'Tu pedido está listo y se te está redirigiendo a WhatsApp.', msgCartCleared: 'Tu carrito ha sido vaciado exitosamente.',
+                msgFillAllFields: 'Por favor, rellene todos los campos.', msgFileReadError: 'Ocurrió un error de lectura de archivo.', msgLogoNotFound: 'Logotipo no encontrado o error durante la eliminación.',
+                whatsAppBaseMessage: 'Por favor, póngase en contacto conmigo sobre mi pedido. Número: (+994) 70-784-14-14'
+            },
+            fr: {
+                // General
+                appTitle: 'LOGOVERS: Designs de Logos Néon et Sombres Personnalisés',
+                headerNavPaid: 'Payants', headerNavFree: 'Gratuits', headerNavCustom: 'Demande personnalisée', headerNavAdmin: 'Panneau d\'administration',
+                cartButtonTitle: 'Mon Panier', settingsButtonTitle: 'Paramètres', footerText: 'Tous droits réservés.', whatsappSupport: 'Support WhatsApp :',
+                heroTitle: "L'éclat de l'avenir dans votre identité de marque", heroSubtitle: 'Découvrez des logos au néon et à thème sombre conçus sur mesure qui feront passer votre marque au niveau supérieur.', heroButton: 'Explorer la collection',
+                addToCartButton: 'Ajouter au panier', priceFree: 'GRATUIT',
+                // Settings
+                settingsModalTitle: 'Thème et langue de l\'interface', settingsModalThemeSubtitle: 'Choisissez l\'éclat qui convient le mieux à votre marque.',
+                themeOrange: 'Néon Orange (Sombre)', themeRed: 'Néon Rouge (Sombre)', themeBlue: 'Néon Bleu (Clair)',
+                settingsModalLangSubtitle: 'Sélection de la langue', settingsModalClose: 'Fermer',
+                // Cart
+                cartTitle: 'MON PANIER', cartTotal: 'Prix Total:', cartCheckoutButton: `Finaliser la commande (WhatsApp)`, cartClearButton: 'Vider le panier', cartEmpty: 'Votre panier est vide.',
+                // Custom Request
+                customRequestTitle: 'Conception de Logo PERSONNALISÉE', 
+                customRequestSubtitle: 'Parlez-nous du logo de vos rêves. Remplissez le formulaire et contactez-nous via **WhatsApp** pour un design sur mesure, créé de A à Z rien que pour vous. (Numéro : +994 70-784-14-14)',
+                customNameLabel: 'Votre Nom / Nom de l\'Entreprise', customMessageLabel: 'Détails de la Demande de Logo', customSubmitButton: 'Envoyer par WhatsApp',
+                customMessagePlaceholder: 'Exemple: Je veux un thème spatial sombre. Couleurs principales orange et violet. Ce sera pour un studio de jeux.',
+                // Admin
+                adminLoginTitle: 'CONNEXION ADMINISTRATEUR', adminPasswordPlaceholder: 'Mot de passe', adminLoginButton: 'Se connecter', adminLogoutButton: 'Se déconnecter',
+                adminPanelTitle: 'Admin : Gestion des Logos', adminAddLogoTitle: '1. Ajouter un nouveau Logo', adminLogoTitleLabel: 'Titre', adminLogoCategoryLabel: 'Catégorie',
+                adminLogoPaidOption: 'Payant (Premium)', adminLogoFreeOption: 'Gratuit', adminLogoPriceLabel: `Prix (${CURRENCY_SYMBOL})`, adminLogoImageLabel: 'Image du Logo (JPEG/PNG)', adminLogoSaveButton: 'Enregistrer le Logo',
+                adminFileError: 'Veuillez sélectionner un fichier image.',
+                adminDeleteLogoTitle: '2. Gérer et Supprimer les Logos', adminDeleteLogoSubtitle: 'Vous pouvez supprimer définitivement les logos existants de la liste ci-dessous.',
+                // Kategoriler
+                premiumLogosTitle: `<span class="neon-accent text-glow">PREMIUM</span> Logos`, premiumLogosSubtitle: 'Logos de qualité professionnelle, à usage unique et au design personnalisé garanti.',
+                freeLogosTitle: `<span class="neon-accent text-glow">GRATUITS</span> Logos`, freeLogosSubtitle: 'Designs haute résolution et libres de droits que vous pouvez utiliser pour les démarrages de projets.',
+                // Messages
+                msgLogoAdded: (title) => `Logo "${title}" ajouté avec succès!`, msgLogoSaved: 'Enregistrer le Logo', msgLogoDeleted: 'Logo supprimé avec succès!',
+                msgAdminLoginSuccess: 'Connexion administrateur réussie!', msgAdminLoginFailed: 'Mot de passe incorrect. Réessayez.', msgAdminLogout: 'Déconnexion administrateur effectuée.',
+                msgCartAdded: (title) => `"${title}" ajouté au panier!`, msgOrderReady: 'Votre commande est prête et vous êtes redirigé vers WhatsApp.', msgCartCleared: 'Votre panier a été vidé avec succès.',
+                msgFillAllFields: 'Veuillez remplir tous les champs.', msgFileReadError: 'Erreur de lecture de fichier survenue.', msgLogoNotFound: 'Logo non trouvé ou erreur lors de la suppression.',
+                whatsAppBaseMessage: 'Veuillez me contacter concernant ma commande. Numéro : (+994) 70-784-14-14'
+            },
+        };
+
+        // Varsayılan Logo Verileri
+        const defaultLogos = {
+            parali: [
+                { id: 1, title: 'Cyber Shield', category: 'Teknoloji & Güvenlik', price: 599, isPaid: true, icon: '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>' },
+                { id: 2, title: 'Nova Bloom', category: 'Güzellik & Kozmetik', price: 450, isPaid: true, icon: '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/></svg>' },
+            ],
+            ucretsiz: [
+                { id: 3, title: 'Data Line', category: 'Analiz & Rapor', price: 0, isPaid: false, icon: '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4"/><path d="M18 12h4"/><path d="M7 9v6"/><path d="M11 7v10"/><path d="M15 9v6"/></svg>' },
+                { id: 4, title: 'User Atom', category: 'Sosyal Medya', price: 0, isPaid: false, icon: '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' },
+            ]
+        };
+        let logos = defaultLogos;
+        let cart = []; 
+
+        // ==========================================================
+        // DİL YÖNETİMİ
+        // ==========================================================
+        function setLanguage(lang) {
+            if (!translations[lang]) {
+                console.error(`Desteklenmeyen dil: ${lang}`);
+                lang = 'tr'; 
+            }
+            
+            currentLang = lang;
+            localStorage.setItem(LANG_STORAGE_KEY, lang);
+            
+            const t = translations[currentLang];
+
+            // 1. data-translate niteliği olan tüm öğeleri güncelle
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (t[key]) {
+                    // Span etiketini koru, içindeki metni değiştir (örn: premiumLogosTitle)
+                    if (element.innerHTML.includes('<span')) {
+                        // Basit bir regex ile span içeriğini koruyarak metni değiştir
+                        // Ancak bu karmaşık, bu yüzden sadece innerHTML'i direkt atıyoruz
+                        element.innerHTML = t[key]; 
+                    } else {
+                        element.textContent = t[key];
+                    }
+                }
+            });
+
+            // 2. data-translate-placeholder niteliği olan tüm öğeleri güncelle
+            document.querySelectorAll('[data-translate-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-translate-placeholder');
+                if (t[key] && element.placeholder !== undefined) {
+                    element.placeholder = t[key];
+                }
+            });
+
+            // 3. data-translate-title niteliği olan tüm öğeleri güncelle
+            document.querySelectorAll('[data-translate-title]').forEach(element => {
+                const key = element.getAttribute('data-translate-title');
+                if (t[key] && element.title !== undefined) {
+                    element.title = t[key];
+                }
+            });
+
+            // 4. Dinamik olarak güncellenmesi gereken başlıkları/içerikleri manuel olarak güncelle
+            document.title = t.appTitle;
+            document.getElementById('language-select').value = lang;
+
+            // 5. İçerikleri yeniden render et
+            renderLogos();
+            renderCart();
+            checkAdminStatus(); // Yönetici panelini de çevirir
+        }
+
+
+        // ==========================================================
+        // TEMA YÖNETİMİ
+        // ==========================================================
+        function setTheme(themeName) {
+            const body = document.body;
+            body.classList.remove('blue-theme', 'red-theme');
+
+            if (themeName === 'blue') {
+                body.classList.add('blue-theme');
+            } else if (themeName === 'red') {
+                body.classList.add('red-theme');
+            } 
+
+            localStorage.setItem(THEME_STORAGE_KEY, themeName);
+            applyThemeVariables();
+            renderLogos();
+            renderCart(); 
+        }
+
+        function applyThemeVariables() {
+            // Sepet ve Ayarlar Butonlarının rengini tema değiştiğinde manuel olarak güncelle
+            const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
+            const primaryBg = getComputedStyle(document.documentElement).getPropertyValue('--primary-bg').trim();
+            
+            const buttons = document.querySelectorAll('header button[title], header button[data-translate-title]');
+            buttons.forEach(btn => {
+                btn.style.backgroundColor = accentColor;
+                btn.style.color = primaryBg; 
+            });
+        }
+
+        function toggleSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.toggle('hidden');
+        }
+        
+        // ==========================================================
+        // LOCALSTORAGE YÖNETİMİ
+        // ==========================================================
+        function loadLogos() {
+            const storedLogos = localStorage.getItem(LOGOS_STORAGE_KEY);
+            if (storedLogos) {
+                try {
+                    logos = JSON.parse(storedLogos);
+                } catch (e) {
+                    console.error("Logo verisi yüklenirken hata oluştu, varsayılanlar kullanılıyor.", e);
+                    logos = defaultLogos;
+                }
+            } else {
+                logos = defaultLogos;
+                saveLogos(); 
+            }
+        }
+
+        function saveLogos() {
+            localStorage.setItem(LOGOS_STORAGE_KEY, JSON.stringify(logos));
+        }
+
+        function loadCart() {
+            const storedCart = localStorage.getItem(CART_STORAGE_KEY);
+            try {
+                cart = storedCart ? JSON.parse(storedCart) : [];
+            } catch (e) {
+                console.error("Sepet verisi yüklenirken hata oluştu.", e);
+                cart = [];
+            }
+        }
+
+        function saveCart() {
+            localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+            document.getElementById('cart-count').textContent = cart.length > 99 ? '99+' : cart.length;
+        }
+
+        // ==========================================================
+        // SEPET İŞLEMLERİ
+        // ==========================================================
+
+        function toggleCartModal(open) {
+            const modal = document.getElementById('cart-modal');
+            if (open) {
+                modal.classList.add('open');
+                renderCart();
+            } else {
+                modal.classList.remove('open');
+            }
+        }
+        
+        function findLogoById(id) {
+            const allLogos = [...(logos.parali || []), ...(logos.ucretsiz || [])];
+            return allLogos.find(logo => logo.id === id);
+        }
+        
+        function addToCart(logoId) {
+            const logo = findLogoById(logoId);
+            const t = translations[currentLang];
+            if (logo && !cart.some(item => item.id === logoId)) {
+                cart.push({
+                    id: logo.id,
+                    title: logo.title,
+                    price: logo.price
+                });
+                saveCart();
+                renderCart();
+                showMessage('request-message', t.msgCartAdded(logo.title), 'green');
+                toggleCartModal(true); 
+            }
+        }
+        
+        function removeFromCart(logoId) {
+            cart = cart.filter(item => item.id !== logoId);
+            saveCart();
+            renderCart();
+        }
+
+        function clearCart() {
+            const t = translations[currentLang];
+            if (cart.length > 0) {
+                cart = [];
+                saveCart();
+                renderCart();
+                showMessage('request-message', t.msgCartCleared, 'red');
+            }
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            const totalElement = document.getElementById('cart-total-price');
+            const checkoutButton = document.getElementById('checkout-button');
+            const t = translations[currentLang];
+
+            container.innerHTML = '';
+            let total = 0;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-center italic opacity-70 mt-12">${t.cartEmpty}</p>`;
+                checkoutButton.disabled = true;
+            } else {
+                checkoutButton.disabled = false;
+                
+                cart.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'flex justify-between items-center p-3 rounded-lg border card-bg';
+                    itemElement.style.borderColor = 'var(--border-color)';
+                    
+                    const priceText = item.price > 0 ? `${item.price} ${CURRENCY_SYMBOL}` : t.priceFree;
+                    total += item.price;
+
+                    itemElement.innerHTML = `
+                        <div>
+                            <p class="font-semibold">${item.title}</p>
+                            <span class="text-sm opacity-80 neon-accent">${priceText}</span>
+                        </div>
+                        <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-400 transition p-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                    `;
+                    container.appendChild(itemElement);
+                });
+            }
+
+            totalElement.textContent = `${total} ${CURRENCY_SYMBOL}`;
+        }
+        
+        // ==========================================================
+        // WHATSAPP İŞLEMLERİ (Sipariş)
+        // ==========================================================
+        function initiateWhatsAppOrder() {
+            if (cart.length === 0) return;
+            const t = translations[currentLang];
+
+            // Sipariş listesini metin olarak hazırla
+            const logoList = cart.map(item => {
+                const priceText = item.price > 0 ? `${item.price} ${CURRENCY_SYMBOL}` : t.priceFree;
+                return `* ${item.title} (${priceText})`;
+            }).join('\n');
+
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            const totalText = `\n\n*${t.cartTotal.replace(':', '')}:* ${total} ${CURRENCY_SYMBOL}`;
+
+            const message = encodeURIComponent(`Merhaba, LOGOVERS'den aşağıdaki logoları sipariş etmek istiyorum:\n\n${logoList}${total > 0 ? totalText : ''}\n\n${t.whatsAppBaseMessage}`);
+
+            // WhatsApp'a yönlendirme
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
+
+            showMessage('request-message', t.msgOrderReady, 'green');
+            clearCart(); 
+        }
+
+
+        // ==========================================================
+        // RENDER İŞLEMLERİ
+        // ==========================================================
+        function createLogoCard(logo) {
+            const t = translations[currentLang];
+            const isPaid = logo.price > 0;
+            const priceText = isPaid ? `${logo.price} ${CURRENCY_SYMBOL}` : t.priceFree;
+            const buttonClass = 'bg-neon-accent font-extrabold btn-neon';
+            const buttonClickAction = `addToCart(${logo.id})`; 
+
+            const card = document.createElement('div');
+            card.className = 'card-bg p-4 rounded-xl card-glow flex flex-col justify-between';
+            
+            let iconContent;
+            
+            if (logo.icon.startsWith('<svg')) {
+                let svg = logo.icon;
+                const iconClass = isPaid ? 'neon-accent text-glow' : 'opacity-70';
+                svg = svg.replace('<svg', `<svg class="${iconClass}" style="color: ${isPaid ? 'var(--accent-color)' : 'var(--main-text)'};"`);
+                iconContent = svg;
+            } else if (logo.icon.startsWith('data:image/') || logo.icon.startsWith('http')) {
+                iconContent = `<img src="${logo.icon}" alt="${logo.title}" class="w-full h-full object-contain p-2" onerror="this.onerror=null;this.src='https://placehold.co/128x128/333/FFF?text=Hata'">`;
+            } else {
+                iconContent = `<div class="text-xl text-red-500">?</div>`;
+            }
+
+            card.innerHTML = `
+                <div class="h-32 border rounded-lg mb-4 flex items-center justify-center" style="border-color: var(--border-color); background-color: var(--primary-bg);">
+                    ${iconContent}
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold">${logo.title}</h4>
+                    <p class="text-sm mb-4 opacity-70">${logo.category}</p>
+                </div>
+                <div class="flex justify-between items-center mt-auto pt-2">
+                    <span class="font-bold text-xl ${isPaid ? 'neon-accent text-glow' : 'opacity-90'}">${priceText}</span>
+                    <button onclick="${buttonClickAction}" class="px-3 py-1.5 text-sm rounded-lg ${buttonClass}">
+                        ${t.addToCartButton}
                     </button>
                 </div>
-                <pre><code class="language-${language}">${code}</code></pre>
-            </div>
-        `;
-        lastIndex = match.index + match[0].length;
-    }
-
-    // Kod bloğu sonrası kalan metni ekle
-    htmlContent += `<p>${text.substring(lastIndex).trim()}</p>`;
-    
-    // Eğer tüm metin sadece kod bloğuysa, boş p etiketlerini temizle
-    htmlContent = htmlContent.replace(/<p><\/p>/g, '').trim();
-
-    return htmlContent;
-}
-
-function renderMessages() {
-    chatArea.innerHTML = '';
-    if (messages.length === 0) {
-        initialStateMsg.classList.remove('hidden');
-        return;
-    }
-    initialStateMsg.classList.add('hidden');
-
-    messages.forEach(m => {
-        const div = document.createElement('div');
-        div.className = m.type === 'user' 
-            ? 'chat-bubble user-bubble self-end' 
-            : 'chat-bubble ai-bubble self-start';
-        
-        if (m.image) {
-            const img = document.createElement('img');
-            img.src = m.image; 
-            img.alt = 'Yüklenen görsel';
-            img.className = 'w-full h-auto rounded-lg mb-2 max-w-full object-cover border border-gray-200 dark:border-gray-600';
-            div.appendChild(img);
+            `;
+            return card;
         }
 
-        const textContent = m.text;
-        
-        if (m.type === 'ai' && textContent.includes('```')) {
-            // Kod bloğu içeriyorsa özel render et
-            div.innerHTML += renderCode(textContent);
-        } else {
-            // Normal metin (veya kodsuz metin)
-            const textNode = document.createElement('p');
-            textNode.textContent = textContent;
-            div.appendChild(textNode);
-        }
-        
-        chatArea.appendChild(div);
-    });
-    chatArea.scrollTop = chatArea.scrollHeight;
-    
-    // Kopyalama butonları için event listenerları ekle
-    document.querySelectorAll('.copy-code-btn').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const code = decodeURIComponent(e.target.dataset.code);
-            // document.execCommand('copy') iframe ortamında daha güvenilirdir
-            const tempInput = document.createElement('textarea');
-            tempInput.value = code;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-            
-            e.target.textContent = 'Kopyalandı!';
-            setTimeout(() => e.target.textContent = 'Kopyala', 1500);
-        });
-    });
-}
+        function renderLogos() {
+            const paraliContainer = document.getElementById('parali-logos');
+            const ucretsizContainer = document.getElementById('ucretsiz-logos');
 
-function renderConversationsList() {
-    conversationsListEl.innerHTML = '';
-    
-    if (conversations.length === 0) {
-        noChatsMsg.classList.remove('hidden');
-        return;
-    }
-    noChatsMsg.classList.add('hidden');
+            if (!logos.parali || !Array.isArray(logos.parali)) logos.parali = [];
+            if (!logos.ucretsiz || !Array.isArray(logos.ucretsiz)) logos.ucretsiz = [];
 
-    saveStateToLocalStorage(false);
+            paraliContainer.innerHTML = '';
+            ucretsizContainer.innerHTML = '';
 
-    conversations.forEach(chat => {
-        const button = document.createElement('button');
-        button.className = `w-full text-left p-3 rounded-xl transition duration-150 truncate ${
-            chat.id === currentChatId 
-                ? 'bg-blue-600 text-white shadow-md' 
-                : 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600'
-        }`;
-        button.textContent = chat.title;
-        button.onclick = () => loadChat(chat.id);
-        conversationsListEl.appendChild(button);
-    });
-}
+            const paidLogos = logos.parali.filter(l => l.price > 0);
+            const freeLogos = [...logos.ucretsiz, ...logos.parali.filter(l => l.price === 0)];
 
-/** Yeni sohbet başlatma fonksiyonu */
-function handleNewChat(showStatus = true) {
-    currentChatId = crypto.randomUUID(); 
-    messages = [];
-    localStorage.setItem('muai_active_chat_id', currentChatId); 
-    
-    renderMessages();
-    messageInput.value = '';
-    imageInput.value = '';
-    imagePreviewContainer.classList.add('hidden');
-    imagePreview.src = '';
-    updateButtonState();
-    aiToolsMenu.classList.remove('open'); // Menüyü kapat
-    
-    chatListSidebar.classList.remove('open');
-    renderConversationsList(); 
-    
-    if (showStatus) {
-        statusMessage.textContent = 'Yeni sohbet başlatıldı.';
-        statusMessage.classList.remove('hidden');
-        setTimeout(() => statusMessage.classList.add('hidden'), 2000);
-    }
-}
-
-/** Belirli bir sohbeti yükler ve aktif hale getirir. */
-function loadChat(chatId) {
-    if (currentChatId === chatId) {
-        chatListSidebar.classList.remove('open');
-        return;
-    }
-
-    const chatToLoad = conversations.find(c => c.id === chatId);
-
-    if (chatToLoad) {
-        saveStateToLocalStorage(false); 
-
-        currentChatId = chatId;
-        messages = chatToLoad.messages;
-        localStorage.setItem('muai_active_chat_id', currentChatId);
-
-        renderMessages();
-        renderConversationsList(); 
-        chatListSidebar.classList.remove('open');
-    }
-}
-
-// --- MAIN SEND LOGIC (Chat Message) ---
-
-async function handleSend() {
-    const text = messageInput.value.trim();
-    const imageFile = imageInput.files[0] || null;
-
-    if (!text && !imageFile) return;
-    statusMessage.classList.add('hidden');
-    replySuggestionsContainer.classList.add('hidden');
-    aiToolsMenu.classList.remove('open');
-
-    abortController = new AbortController();
-    const signal = abortController.signal;
-
-    toggleInputState(true, 'sendBtn', true); // true: Durdur butonu göster
-
-    let imageApiData = null; 
-    let imageDisplayData = null; 
-    let newUserMsg = null;
-
-    try {
-        // 1. Process User Message and Image
-        if (imageFile) {
-            const data = await fileToBase64(imageFile);
-            imageApiData = { mimeType: data.mimeType, data: data.data };
-            imageDisplayData = data.dataUrl;
+            paidLogos.forEach(logo => paraliContainer.appendChild(createLogoCard({...logo, isPaid: true})));
+            freeLogos.forEach(logo => ucretsizContainer.appendChild(createLogoCard({...logo, isPaid: false})));
         }
 
-        // 2. Prepare User Message for History
-        newUserMsg = {
-            type: 'user',
-            text: text || (imageFile ? 'Görsel gönderildi.' : ''),
-            image: imageDisplayData
-        };
-        messages.push(newUserMsg);
-        renderMessages();
-        
-        // 3. Get AI Response
-        const aiText = await generalGeminiCall(
-            signal,
-            messages.slice(0, -1),
-            text, 
-            imageApiData
-        );
+        // ==========================================================
+        // YÖNETİCİ LOGO EKLEME İŞLEMLERİ
+        // ==========================================================
+        function addLogo(event) {
+            event.preventDefault();
+            const t = translations[currentLang];
+            const title = document.getElementById('logo-title').value;
+            const category = document.getElementById('logo-category').value;
+            const price = parseInt(document.getElementById('logo-price').value || 0);
+            const imageFile = document.getElementById('logo-image-file').files[0];
+            const errorBox = document.getElementById('file-error');
 
-        // 4. Save AI Response to Local State
-        const newAiMsg = {
-            type: 'ai',
-            text: aiText,
-            image: null
-        };
-        messages.push(newAiMsg);
-
-        // 5. Save Conversation to LocalStorage
-        saveStateToLocalStorage(false); 
-
-        // 6. Render and Speak AI Response (Optional)
-        renderMessages();
-        renderConversationsList();
-        if (settings.ttsEnabled) { 
-            await callTtsApi(aiText);
-        }
-
-    } catch (e) {
-        if (e.message === "İşlem İptal Edildi") {
-            statusMessage.textContent = 'Gönderme işlemi iptal edildi.';
-        } else {
-            console.error("Hata oluştu:", e);
-            statusMessage.textContent = `Mesaj gönderilemedi: ${e.message}. Konsolu kontrol edin.`;
-        }
-        statusMessage.classList.remove('hidden');
-        
-        // Hata durumunda (iptal dahil) son kullanıcı mesajını çıkar
-        if (newUserMsg) messages.pop();
-        renderMessages();
-    } finally {
-        // Reset UI
-        messageInput.value = '';
-        imageInput.value = '';
-        imagePreviewContainer.classList.add('hidden');
-        imagePreview.src = '';
-        abortController = null;
-        toggleInputState(false);
-    }
-}
-
-// --- AI TOOL LOGIC (Summarize / Continue / Code Gen / Suggest Reply) ---
-
-function toggleInputState(isLoading, currentToolId = 'sendBtn', showStopBtn = false) {
-    const isMainSend = currentToolId === 'sendBtn';
-
-    messageInput.disabled = isLoading;
-    imageInput.disabled = isLoading;
-    aiMenuToggle.disabled = isLoading;
-    
-    // AI Tool Butonlarını (menü içindekileri) yönet
-    document.querySelectorAll('.ai-tool-btn').forEach(btn => {
-        const isToolActive = btn.id === currentToolId;
-        // Eğer yükleniyorsa disable et
-        if (isLoading) {
-            btn.disabled = true;
-            if (isToolActive && showStopBtn) {
-                 btn.innerHTML = '<div class="loader"></div> Durdur';
-                 btn.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'; // Kırmızımsı arka plan
-                 btn.style.color = '#ef4444'; // Kırmızı yazı
+            if (!imageFile) {
+                errorBox.classList.remove('hidden');
+                showMessage('admin-message', t.adminFileError, 'red');
+                return;
             }
-        } else {
-            // Yüklenme bittiyse orijinal durumu geri getir
-            btn.style.backgroundColor = '';
-            btn.style.color = '';
-            btn.innerHTML = btn.originalHTML;
-            // Durum güncellemeyi trigger et (updateButtonState)
+            errorBox.classList.add('hidden');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Image = e.target.result;
+
+                const newLogo = {
+                    id: Date.now(), 
+                    title: title,
+                    category: category === 'parali' ? 'Premium Logo' : 'Genel Logo',
+                    price: price,
+                    icon: base64Image,
+                };
+                
+                if (category === 'parali') {
+                    logos.parali.push(newLogo);
+                } else {
+                    logos.ucretsiz.push(newLogo);
+                }
+
+                saveLogos();
+                renderLogos();
+                renderAdminLogoList(); 
+                document.getElementById('add-logo-form').reset();
+                
+                showMessage('admin-message', t.msgLogoAdded(title), 'green');
+            };
+
+            reader.onerror = function() {
+                showMessage('admin-message', t.msgFileReadError, 'red');
+            };
+
+            reader.readAsDataURL(imageFile); 
         }
-    });
+        
+        // ==========================================================
+        // YÖNETİCİ LOGO SİLME İŞLEMLERİ
+        // ==========================================================
+        function deleteLogo(id) {
+            const t = translations[currentLang];
+            const logoId = parseInt(id);
 
-    if (isMainSend) {
-        sendBtn.innerHTML = showStopBtn ? '<div class="loader"></div> Durdur' : (isLoading ? '<div class="loader"></div>' : 'Gönder');
-        // Stop butonu için event listener
-        sendBtn.onclick = showStopBtn ? handleStop : handleSend;
-    }
-
-    updateButtonState();
-}
-
-function handleStop() {
-    if (abortController) {
-        abortController.abort();
-    }
-    toggleInputState(false);
-    statusMessage.textContent = 'İşlem iptal ediliyor...';
-    statusMessage.classList.remove('hidden');
-    setTimeout(() => statusMessage.classList.add('hidden'), 2000);
-}
-
-async function handleAITool(toolType) {
-    const text = messageInput.value.trim();
-    if (toolType !== 'suggestReply' && !text) return;
-    if (toolType === 'suggestReply' && (messages.length === 0 || text)) return;
-
-    const buttonId = 
-        toolType === 'summarize' ? 'summarizeBtn' : 
-        toolType === 'continueText' ? 'continueTextBtn' : 
-        toolType === 'generateCode' ? 'generateCodeBtn' :
-        'suggestReplyBtn';
-    
-    const btnElement = document.getElementById(buttonId);
-    if (!btnElement.originalHTML) {
-        btnElement.originalHTML = btnElement.innerHTML;
-    }
-    
-    abortController = new AbortController();
-    const signal = abortController.signal;
-
-    toggleInputState(true, buttonId, true);
-    statusMessage.classList.add('hidden');
-    replySuggestionsContainer.classList.add('hidden');
-    aiToolsMenu.classList.remove('open');
-
-
-    let instruction;
-    let successMessage;
-    let aiResult;
-
-    try {
-        if (toolType === 'summarize') {
-            instruction = `Summarize the following text concisely in one or two paragraphs. The summary should be in the user's selected language (${settings.lang}). Return only the summary text.`;
-            aiResult = await generalGeminiCall(signal, [], text, null, instruction);
-            successMessage = "Özetleme işlemi tamamlandı.";
-
-            const userMsg = { type: 'user', text: `[ÖZET İSTEĞİ] Metin:\n${text.substring(0, 100)}...` };
-            const aiMsg = { type: 'ai', text: `✨ Özet: ${aiResult}` };
-            messages.push(userMsg, aiMsg);
-            saveStateToLocalStorage(false);
-            renderMessages();
-
-            if (settings.ttsEnabled) { 
-                await callTtsApi(`Özetleme: ${aiResult}`);
+            let deleted = false;
+            
+            const initialPaidLength = logos.parali.length;
+            logos.parali = logos.parali.filter(logo => logo.id !== logoId);
+            if (logos.parali.length < initialPaidLength) {
+                deleted = true;
             }
 
-        } else if (toolType === 'continueText') {
-            instruction = `Continue the following text logically and creatively to complete a short paragraph. The continuation must be in the user's selected language (${settings.lang}). Return ONLY the continued text.`;
-            aiResult = await generalGeminiCall(signal, [], text, null, instruction);
-            successMessage = "Metin tamamlama işlemi tamamlandı.";
-            
-            messageInput.value = text + " " + aiResult.trim();
+            if (!deleted) {
+                const initialFreeLength = logos.ucretsiz.length;
+                logos.ucretsiz = logos.ucretsiz.filter(logo => logo.id !== logoId);
+                if (logos.ucretsiz.length < initialFreeLength) {
+                    deleted = true;
+                }
+            }
 
-        } else if (toolType === 'generateCode') {
-             instruction = `Generate a single, complete, and functional code snippet based on the following request: "${text}". The code must be enclosed in a single markdown code block (e.g., \`\`\`html... \`\`\`). Do not provide any conversational text outside of the code block.`;
-            aiResult = await generalGeminiCall(signal, [], text, null, instruction);
-            successMessage = "Kod oluşturma işlemi tamamlandı.";
-            
-            const userMsg = { type: 'user', text: `[KOD İSTEĞİ] ${text}` };
-            const aiMsg = { type: 'ai', text: `👨‍💻 Kod Üretimi:\n${aiResult}` };
-            messages.push(userMsg, aiMsg);
-            saveStateToLocalStorage(false);
-            renderMessages();
+            if (deleted) {
+                cart = cart.filter(item => item.id !== logoId);
+                saveCart();
 
-        } else if (toolType === 'suggestReply') {
-            instruction = `Based on the chat history (which includes the last user message and the model's last reply), generate 3 short, conversational, and contextually appropriate reply suggestions. The replies must be in the user's selected language (${settings.lang}). Return only a JSON array of 3 strings.`;
-            successMessage = "Yanıt önerileri yüklendi.";
-
-            const contextHistory = messages.slice(-5); 
-            
-            const replySchema = {
-                type: "ARRAY",
-                items: { type: "STRING" }
-            };
-            
-            aiResult = await structuredGeminiCall(signal, contextHistory, instruction, replySchema);
-            renderReplySuggestions(aiResult);
+                saveLogos();
+                renderLogos();
+                renderAdminLogoList(); 
+                showMessage('admin-message', t.msgLogoDeleted, 'green');
+            } else {
+                showMessage('admin-message', t.msgLogoNotFound, 'red');
+            }
         }
 
-        statusMessage.textContent = successMessage;
-        statusMessage.classList.remove('hidden');
-        setTimeout(() => statusMessage.classList.add('hidden'), 3000);
+        // ==========================================================
+        // YÖNETİCİ LOGO LİSTESİ RENDER
+        // ==========================================================
+        function renderAdminLogoList() {
+            const listContainer = document.getElementById('admin-logo-list');
+            const t = translations[currentLang];
+            listContainer.innerHTML = '';
+            
+            const allLogos = [
+                ...(logos.parali || []).map(l => ({ ...l, type: t.adminLogoPaidOption.split(' (')[0] })),
+                ...(logos.ucretsiz || []).map(l => ({ ...l, type: t.adminLogoFreeOption })),
+            ].sort((a, b) => b.id - a.id); 
 
-    } catch (e) {
-        if (e.message !== "İşlem İptal Edildi") {
-            statusMessage.textContent = e.message || "AI aracı kullanılırken bir hata oluştu.";
-            statusMessage.classList.remove('hidden');
+            if (allLogos.length === 0) {
+                listContainer.innerHTML = `<p class="italic opacity-60 p-4 text-center">${t.adminDeleteLogoSubtitle.split(' ').slice(0, 5).join(' ')}...</p>`; // Basit bir mesaj
+                return;
+            }
+
+            allLogos.forEach(logo => {
+                const logoElement = document.createElement('div');
+                logoElement.className = 'flex items-center justify-between p-3 rounded-lg border card-bg hover:bg-red-900/10 transition duration-200';
+                logoElement.style.borderColor = 'var(--border-color)';
+                
+                logoElement.innerHTML = `
+                    <div class="flex-grow">
+                        <p class="font-semibold">${logo.title}</p>
+                        <span class="text-xs opacity-70">${logo.type} | ID: ${logo.id}</span>
+                    </div>
+                    <button onclick="deleteLogo(${logo.id})" class="text-red-500 hover:text-red-400 transition p-1 ml-4" title="${t.adminDeleteLogoTitle.split(' ').slice(-1)[0]}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                `;
+                listContainer.appendChild(logoElement);
+            });
         }
-    } finally {
-        abortController = null;
-        toggleInputState(false);
-    }
-}
-
-function renderReplySuggestions(suggestions) {
-    replySuggestionsContainer.innerHTML = '';
-    
-    if (Array.isArray(suggestions) && suggestions.length > 0) {
-        suggestions.forEach(reply => {
-            const btn = document.createElement('button');
-            btn.className = 'text-sm px-3 py-2 bg-blue-500 text-white rounded-xl shadow-md hover:bg-blue-600 transition duration-150 truncate max-w-full';
-            btn.textContent = reply;
-            btn.onclick = () => {
-                messageInput.value = reply;
-                handleSend(); // Tıkladıktan sonra doğrudan gönder
-            };
-            replySuggestionsContainer.appendChild(btn);
-        });
-        replySuggestionsContainer.classList.remove('hidden');
-    } else {
-        replySuggestionsContainer.classList.add('hidden');
-    }
-}
-
-// --- THEME LOGIC ---
-
-function applyTheme(theme) {
-    if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-    } else {
-        document.documentElement.classList.remove('dark');
-    }
-}
-
-// --- EVENT LISTENERS and SETUP ---
-
-function updateButtonState() {
-    const text = messageInput.value.trim();
-    const hasImage = imageInput.files.length > 0;
-    const hasHistory = messages.length > 0;
-    const isSending = abortController !== null;
-    
-    // Gönder butonu her zaman disable, eğer loading varsa toggleInputState'te Durdur'a döner
-    sendBtn.disabled = (!text && !hasImage) || isSending; 
-    
-    // AI Tool butonları (menü içinde)
-    const textAvailable = text !== '';
-    const toolsEnabled = !isSending;
-    
-    summarizeBtn.disabled = !textAvailable || !toolsEnabled;
-    continueTextBtn.disabled = !textAvailable || !toolsEnabled;
-    generateCodeBtn.disabled = !textAvailable || !toolsEnabled; // Yeni buton
-    
-    // Yanıt Öner butonu için (Metin olmamalı, geçmiş olmalı)
-    suggestReplyBtn.disabled = textAvailable || !hasHistory || !toolsEnabled;
-
-    // Eğer metin varsa önerileri gizle
-    if (textAvailable || isSending) {
-        replySuggestionsContainer.classList.add('hidden');
-    }
-    
-    // Eğer menü açıksa ve loading başladıysa kapat
-    if (isSending) {
-        aiToolsMenu.classList.remove('open');
-    }
-}
-
-function saveSettings() {
-    settings.lang = langSelectModal.value;
-    settings.voice = voiceSelectModal.value;
-    settings.ttsEnabled = ttsToggleModal.checked;
-    settings.theme = themeToggleModal.checked ? 'dark' : 'light';
-    
-    saveStateToLocalStorage(true); 
-    applyTheme(settings.theme);
-}
-
-// Sidebar Toggles
-toggleSidebarBtn.addEventListener('click', () => { chatListSidebar.classList.add('open'); renderConversationsList(); });
-closeSidebarBtn.addEventListener('click', () => { chatListSidebar.classList.remove('open'); });
-
-// Settings Modal Toggles
-settingsBtn.addEventListener('click', () => {
-    langSelectModal.value = settings.lang;
-    voiceSelectModal.value = settings.voice;
-    ttsToggleModal.checked = settings.ttsEnabled;
-    themeToggleModal.checked = settings.theme === 'dark';
-    settingsModal.classList.remove('hidden');
-});
-closeSettingsBtn.addEventListener('click', () => {
-    saveSettings(); 
-    settingsModal.classList.add('hidden');
-});
-
-// AI Menu Toggle
-aiMenuToggle.addEventListener('click', (e) => {
-    // Tıklamayı engelleme
-    e.stopPropagation();
-    aiToolsMenu.classList.toggle('open');
-});
-
-// Menü dışına tıklayınca menüyü kapat
-document.addEventListener('click', (e) => {
-    if (!aiToolsMenu.contains(e.target) && e.target !== aiMenuToggle) {
-        aiToolsMenu.classList.remove('open');
-    }
-});
 
 
-// New Chat Button
-newChatBtn.addEventListener('click', () => handleNewChat(true));
+        // ==========================================================
+        // YÖNETİCİ GİRİŞ İŞLEMLERİ (Gizli)
+        // ==========================================================
+        function toggleAdminLoginBox() {
+            const loginBox = document.getElementById('admin-login-box');
+            loginBox.classList.toggle('admin-hidden');
+            
+            const isLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true';
 
-// Send & Input Listeners
-sendBtn.addEventListener('click', handleSend); // Başlangıçta handleSend olarak ayarlı
-messageInput.addEventListener('input', updateButtonState);
-messageInput.addEventListener('keydown', (e) => { 
-    if(e.key === 'Enter' && !sendBtn.disabled && !abortController) {
-        e.preventDefault(); 
-        handleSend(); 
-    }
-});
-
-// AI Tool Buttons Listeners
-document.querySelectorAll('.ai-tool-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        handleAITool(btn.dataset.tool);
-    });
-});
-
-// Image preview logic
-imageInput.addEventListener('change', (e) => {
-    updateButtonState();
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            imagePreview.src = e.target.result;
-            imagePreviewContainer.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-    } else {
-        imagePreviewContainer.classList.add('hidden');
-        imagePreview.src = '';
-    }
-});
-
-// Clear image
-clearImageBtn.addEventListener('click', () => {
-    imageInput.value = '';
-    imagePreviewContainer.classList.add('hidden');
-    imagePreview.src = '';
-    updateButtonState();
-});
-
-// --- DRAG AND DROP SETUP ---
-function setupDragAndDrop() {
-    const dropArea = document.body;
-
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, preventDefaults, false);
-    });
-
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropArea.addEventListener(eventName, highlight, false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, (e) => {
-             if (e.target === dropArea) unhighlight(e);
-        }, false);
-    });
-
-    dropArea.addEventListener('drop', handleDrop, false);
-
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    function highlight(e) {
-        dropArea.classList.add('drag-over');
-    }
-
-    function unhighlight(e) {
-        dropArea.classList.remove('drag-over');
-    }
-
-    function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-
-        if (files.length > 0 && files[0].type.startsWith('image/')) {
-            imageInput.files = files;
-            imageInput.dispatchEvent(new Event('change'));
+            if (isLoggedIn) {
+                document.getElementById('admin-login-form').classList.add('hidden');
+                document.getElementById('admin-logout-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('admin-login-form').classList.remove('hidden');
+                document.getElementById('admin-logout-btn').classList.add('hidden');
+            }
         }
-    }
-}
 
+        function checkAdminStatus() {
+            const isLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true';
+            const adminPanel = document.getElementById('admin-panel');
+            const adminLinkNav = document.getElementById('admin-link-nav');
+            
+            if (isLoggedIn) {
+                adminPanel.classList.remove('hidden');
+                adminLinkNav.classList.remove('hidden');
+                renderAdminLogoList(); 
+            } else {
+                adminPanel.classList.add('hidden');
+                adminLinkNav.classList.add('hidden');
+            }
+        }
 
-// --- INITIALIZATION ---
-window.onload = () => {
-    loadStateFromLocalStorage(); 
-    applyTheme(settings.theme); 
-    renderMessages();
-    renderConversationsList();
-    updateButtonState();
-    setupDragAndDrop(); 
-};
-</script>
+        function toggleAdminPanel() {
+             document.getElementById('admin-panel').classList.toggle('hidden');
+             if (!document.getElementById('admin-panel').classList.contains('hidden')) {
+                 renderAdminLogoList(); 
+             }
+        }
+
+        function handleAdminLogin(event) {
+            event.preventDefault();
+            const t = translations[currentLang];
+            const passwordInput = document.getElementById('admin-password');
+            if (passwordInput.value === ADMIN_PASSWORD) {
+                localStorage.setItem('isAdminLoggedIn', 'true');
+                passwordInput.value = '';
+                toggleAdminLoginBox(); 
+                checkAdminStatus();
+                showMessage('admin-message', t.msgAdminLoginSuccess, 'green');
+            } else {
+                showMessage('admin-message', t.msgAdminLoginFailed, 'red');
+                passwordInput.value = '';
+            }
+        }
+
+        function handleAdminLogout() {
+            const t = translations[currentLang];
+            localStorage.removeItem('isAdminLoggedIn');
+            checkAdminStatus();
+            toggleAdminLoginBox(); 
+            showMessage('admin-message', t.msgAdminLogout, 'green');
+        }
+
+        // ==========================================================
+        // MESAJ GÖSTERME FONKSİYONU (Alert yerine)
+        // ==========================================================
+        function showMessage(elementId, text, type) {
+            const messageBox = document.getElementById(elementId);
+            messageBox.textContent = text;
+            messageBox.classList.remove('hidden', 'bg-red-900', 'text-red-300', 'bg-green-900', 'text-green-300', 'bg-red-500/10', 'text-red-300', 'bg-green-500/10', 'text-green-300');
+            
+            if (type === 'green') {
+                messageBox.classList.add('bg-green-500/10', 'text-green-300');
+            } else if (type === 'red') {
+                messageBox.classList.add('bg-red-500/10', 'text-red-300');
+            }
+            
+            messageBox.classList.remove('hidden');
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        }
+
+        // ==========================================================
+        // ÖZEL İSTEK İŞLEMLERİ (WhatsApp'a Yönlendirme)
+        // ==========================================================
+        function handleCustomRequest(event) {
+            event.preventDefault();
+            const t = translations[currentLang];
+            const form = event.target;
+            
+            const name = document.getElementById('custom-name').value;
+            const message = document.getElementById('custom-message').value;
+
+            if (name && message) {
+                const whatsappMessage = encodeURIComponent(
+                    `${t.customRequestTitle}\n\n` + // Başlık için basit bir başlık kullan
+                    `*${t.customNameLabel}:* ${name}\n` +
+                    `*${t.customMessageLabel}:*\n${message}\n\n` +
+                    `${t.whatsAppBaseMessage}`
+                );
+
+                // WhatsApp'a yönlendirme
+                window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`, '_blank');
+                
+                showMessage('request-message', t.msgOrderReady, 'green');
+                form.reset();
+            } else {
+                showMessage('request-message', t.msgFillAllFields, 'red');
+            }
+        }
+
+        // ==========================================================
+        // BAŞLANGIÇ İŞLEMLERİ
+        // ==========================================================
+        window.onload = function() {
+            // 1. Tema ve Dili Yükle
+            const storedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'orange';
+            const storedLang = localStorage.getItem(LANG_STORAGE_KEY) || 'tr';
+            
+            setTheme(storedTheme);
+            setLanguage(storedLang); // Dili ayarla ve tüm metinleri çevir
+            
+            // 2. Verileri Yükle
+            loadLogos();
+            loadCart(); 
+            
+            // 3. UI'ı Hazırla
+            renderLogos();
+            renderCart(); 
+            checkAdminStatus();
+        }
+    </script>
 </body>
 </html>
+
