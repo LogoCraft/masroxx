@@ -49,15 +49,36 @@
             filter: blur(80px);
         }
 
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
         select option {
             background-color: #0a0a0a;
             color: white;
         }
+
+        .modal-enter {
+            animation: modalFadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
-<body>
+<body class="custom-scrollbar">
     <div id="mouse-follower"></div>
 
+    <!-- Arxa Fon Effektləri -->
     <div class="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
         <div class="absolute top-[10%] left-[5%] w-[500px] h-[500px] bg-blue-600/10 blur-[150px] rounded-full led-pulse"></div>
         <div class="absolute bottom-[10%] right-[5%] w-[600px] h-[600px] bg-purple-600/10 blur-[180px] rounded-full led-pulse" style="animation-delay: 2s;"></div>
@@ -75,7 +96,7 @@
                     AI<span class="text-outline">VAULT</span>
                 </h1>
                 <p class="mt-6 text-gray-500 max-w-sm text-sm border-l border-white/10 pl-4">
-                    API açarları və ideyalar üçün hazırlanmış <span class="text-white">üstün səviyyəli</span> saxlanc.
+                    Məlumatlarınızı <span class="text-white">təhlükəsiz və geniş</span> formatda idarə edin.
                 </p>
             </div>
             
@@ -86,16 +107,17 @@
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <!-- Sol Panel: Giriş Formu -->
             <div class="lg:col-span-4">
                 <div class="sticky top-12 p-8 rounded-[2rem] bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-3xl shadow-2xl">
                     <h2 class="text-2xl font-bold mb-8 flex items-center gap-3">
-                        <i data-lucide="plus" class="text-blue-400"></i> Giriş Paneli
+                        <i data-lucide="plus-circle" class="text-blue-400"></i> Yeni Qeyd
                     </h2>
                     
                     <form id="vault-form" class="space-y-6">
                         <div class="space-y-2">
                             <label class="text-[10px] uppercase tracking-[0.2em] text-white/40 ml-1">Obyektin Adı</label>
-                            <input type="text" id="title" required placeholder="Məs: GPT-4 Key" class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:border-blue-500/50 transition-all text-sm">
+                            <input type="text" id="title" required placeholder="Məs: GPT-4 API" class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:border-blue-500/50 transition-all text-sm">
                         </div>
 
                         <div class="space-y-2">
@@ -114,14 +136,55 @@
                         </div>
 
                         <button type="submit" class="w-full py-5 bg-white text-black font-black rounded-2xl hover:scale-[1.01] active:scale-95 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] flex items-center justify-center gap-2 uppercase tracking-widest text-xs">
-                            <i data-lucide="zap" class="w-4 h-4"></i> Yadda Saxla
+                            <i data-lucide="save" class="w-4 h-4"></i> Yadda Saxla
                         </button>
                     </form>
                 </div>
             </div>
 
+            <!-- Sağ Panel: Siyahı -->
             <div class="lg:col-span-8">
-                <div id="items-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                <div id="items-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Kartlar bura gəlir -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Geniş Baxış Modalı -->
+    <div id="detail-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 md:p-10">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="closeModal()"></div>
+        <div class="relative w-full max-w-3xl bg-[#0a0a0a] border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden modal-enter">
+            <div class="p-8 border-b border-white/5 flex justify-between items-center bg-white/5">
+                <div class="flex items-center gap-4">
+                    <div id="modal-icon-container" class="p-3 rounded-2xl bg-blue-500/10 text-blue-400">
+                        <i data-lucide="info" id="modal-icon"></i>
+                    </div>
+                    <div>
+                        <h2 id="modal-title" class="text-2xl font-bold tracking-tight">Məlumat Təfərrüatı</h2>
+                        <span id="modal-category" class="text-[10px] uppercase tracking-widest text-white/40">KATEQORİYA</span>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="p-3 hover:bg-white/5 rounded-full transition-colors">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="p-8 space-y-6">
+                <div class="space-y-2">
+                    <label class="text-[10px] uppercase tracking-widest text-white/30">Məzmun</label>
+                    <div id="modal-content" class="bg-black/50 p-6 rounded-3xl border border-white/5 font-mono text-white/80 whitespace-pre-wrap min-h-[200px] overflow-y-auto max-h-[40vh] custom-scrollbar"></div>
+                </div>
+                <div class="flex flex-wrap gap-4 pt-4">
+                    <button id="modal-copy-btn" class="flex-1 py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white hover:text-black transition-all font-bold text-sm flex items-center justify-center gap-2">
+                        <i data-lucide="copy" class="w-4 h-4"></i> Kopyala
+                    </button>
+                    <button id="modal-edit-btn" class="flex-1 py-4 bg-blue-600/20 border border-blue-500/30 text-blue-400 rounded-2xl hover:bg-blue-600 hover:text-white transition-all font-bold text-sm flex items-center justify-center gap-2">
+                        <i data-lucide="edit-3" class="w-4 h-4"></i> Düzəliş et
+                    </button>
+                    <button id="modal-delete-btn" class="flex-1 py-4 bg-red-600/10 border border-red-500/20 text-red-500 rounded-2xl hover:bg-red-600 hover:text-white transition-all font-bold text-sm flex items-center justify-center gap-2">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i> Sil
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -129,18 +192,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // UI Elementləri
-        const follower = document.getElementById('mouse-follower');
-        const form = document.getElementById('vault-form');
-        const container = document.getElementById('items-container');
-
-        // Mouse Takip
-        document.addEventListener('mousemove', (e) => {
-            follower.style.left = e.clientX + 'px';
-            follower.style.top = e.clientY + 'px';
-        });
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Firebase Konfiqurasiyası
         const firebaseConfig = {
@@ -160,6 +212,60 @@
 
         let currentUser = null;
         let isLocalMode = false;
+        let activeItems = [];
+
+        // Global Funksiyalar (Window obyekti üzərindən)
+        window.openDetail = (id) => {
+            const item = activeItems.find(i => i.id === id);
+            if(!item) return;
+
+            const modal = document.getElementById('detail-modal');
+            document.getElementById('modal-title').innerText = item.title;
+            document.getElementById('modal-category').innerText = item.category;
+            document.getElementById('modal-content').innerText = item.content;
+            
+            // Modal icon yeniləmə
+            const iconName = getIcon(item.category);
+            document.getElementById('modal-icon-container').innerHTML = `<i data-lucide="${iconName}"></i>`;
+            
+            // Kopya düyməsi
+            document.getElementById('modal-copy-btn').onclick = () => {
+                navigator.clipboard.writeText(item.content);
+                const btn = document.getElementById('modal-copy-btn');
+                const oldContent = btn.innerHTML;
+                btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Kopyalandı!`;
+                lucide.createIcons();
+                setTimeout(() => { btn.innerHTML = oldContent; lucide.createIcons(); }, 2000);
+            };
+
+            // Silmə düyməsi
+            document.getElementById('modal-delete-btn').onclick = () => {
+                window.deleteItem(id);
+                closeModal();
+            };
+
+            // Düzəliş düyməsi
+            document.getElementById('modal-edit-btn').onclick = () => {
+                const newContent = prompt("Yeni mətni daxil edin:", item.content);
+                if(newContent && newContent !== item.content) {
+                    window.updateItem(id, { content: newContent });
+                    document.getElementById('modal-content').innerText = newContent;
+                }
+            };
+
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.closeModal = () => {
+            document.getElementById('detail-modal').classList.add('hidden');
+        };
+
+        const follower = document.getElementById('mouse-follower');
+        document.addEventListener('mousemove', (e) => {
+            follower.style.left = e.clientX + 'px';
+            follower.style.top = e.clientY + 'px';
+        });
 
         const updateUIStatus = (id, colorClass, shadowColor) => {
             const display = document.getElementById('user-id-display');
@@ -169,12 +275,10 @@
             dot.style.boxShadow = `0 0 10px ${shadowColor}`;
         };
 
-        // Firebase-də problem olarsa yerli yaddaşa keçid
         const enableLocalMode = () => {
             isLocalMode = true;
-            const fallbackId = "OFFLINE_USER";
-            currentUser = { uid: fallbackId };
-            updateUIStatus(`LOKAL REJİM: ${fallbackId}`, "bg-red-500", "#ef4444");
+            currentUser = { uid: "OFFLINE_USER" };
+            updateUIStatus(`LOKAL REJİM: OFFLINE`, "bg-red-500", "#ef4444");
             renderVaultItems(getLocalData());
         };
 
@@ -183,10 +287,8 @@
 
         const initAuth = async () => {
             try {
-                // Əgər Authentication admin tərəfindən məhdudlaşdırılıbsa (xətanın səbəbi), catch-ə düşəcək
                 await signInAnonymously(auth);
             } catch (err) {
-                console.warn("Firebase Auth xətası: Giriş məhdudlaşdırılıb. Lokal rejimə keçilir.", err);
                 enableLocalMode();
             }
         };
@@ -205,36 +307,44 @@
         };
 
         const renderVaultItems = (items) => {
+            activeItems = items;
+            const container = document.getElementById('items-container');
             container.innerHTML = '';
+            
             if (items.length === 0) {
-                container.innerHTML = '<div class="col-span-full text-center py-20 opacity-30 italic">Hələ ki, məlumat yoxdur...</div>';
+                container.innerHTML = '<div class="col-span-full text-center py-20 opacity-30 italic">Saxlanc boşdur...</div>';
                 return;
             }
 
             items.forEach(item => {
                 const card = document.createElement('div');
-                card.className = "group relative p-8 rounded-[2.5rem] bg-gradient-to-br from-white/[0.05] to-transparent border border-white/5 transition-all duration-500 hover:border-blue-500/30";
+                card.className = "group relative p-8 rounded-[2.5rem] bg-[#0a0a0a]/50 border border-white/5 transition-all duration-500 hover:border-blue-500/40 hover:bg-white/[0.02] cursor-pointer shadow-xl";
+                card.onclick = (e) => {
+                    if(!e.target.closest('.action-btn')) window.openDetail(item.id);
+                };
+                
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-6">
-                        <div class="p-3 rounded-2xl bg-white/5">
+                        <div class="p-3 rounded-2xl bg-white/5 text-white/60 group-hover:text-blue-400 group-hover:bg-blue-400/10 transition-all">
                             <i data-lucide="${getIcon(item.category)}" class="w-5 h-5"></i>
                         </div>
-                        <button data-id="${item.id}" class="delete-btn p-2 text-white/10 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all">
-                            <i data-lucide="trash-2" class="w-5 h-5"></i>
-                        </button>
+                        <div class="flex gap-2">
+                             <button onclick="window.deleteItem('${item.id}')" class="action-btn p-2 text-white/10 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all">
+                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                            </button>
+                        </div>
                     </div>
-                    <h3 class="text-xl font-bold mb-4 tracking-tight group-hover:text-blue-400 transition-colors">${item.title}</h3>
-                    <p class="text-sm text-white/60 font-mono leading-relaxed break-all bg-black/40 p-4 rounded-2xl border border-white/5">${item.content}</p>
-                    <div class="mt-8 pt-6 border-t border-white/5 flex items-center justify-between">
-                        <span class="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">${item.category}</span>
-                        <i data-lucide="lock" class="w-3 h-3 opacity-20"></i>
+                    <h3 class="text-xl font-bold mb-3 tracking-tight group-hover:text-white transition-colors line-clamp-1">${item.title}</h3>
+                    <p class="text-sm text-white/40 font-mono leading-relaxed line-clamp-3 mb-6">${item.content}</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] bg-white/5 px-3 py-1 rounded-full">${item.category}</span>
+                        <div class="flex items-center gap-2 text-white/20 text-[10px] font-mono">
+                            <span>TƏFƏRRÜAT</span>
+                            <i data-lucide="arrow-up-right" class="w-3 h-3"></i>
+                        </div>
                     </div>
                 `;
                 container.appendChild(card);
-            });
-
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.onclick = () => window.deleteItem(btn.dataset.id);
             });
             lucide.createIcons();
         };
@@ -248,17 +358,15 @@
                     .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
                 renderVaultItems(docs);
             }, (err) => {
-                console.warn("Firestore oxuma xətası (İcazə yoxdur). Lokal rejim aktiv edilir.");
                 enableLocalMode();
             });
         }
 
-        form.addEventListener('submit', async (e) => {
+        document.getElementById('vault-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) return;
             
             const newItem = {
-                id: Date.now().toString(),
                 title: document.getElementById('title').value,
                 content: document.getElementById('content').value,
                 category: document.getElementById('category').value,
@@ -268,18 +376,16 @@
 
             if (isLocalMode) {
                 const data = getLocalData();
+                newItem.id = Date.now().toString();
                 data.unshift(newItem);
                 saveLocalData(data);
                 renderVaultItems(data);
-                form.reset();
+                e.target.reset();
             } else {
                 try {
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'vault_items'), newItem);
-                    form.reset();
-                } catch (err) { 
-                    console.error("Yadda saxlanarkən xəta:", err);
-                    alert("Firebase-ə yazıla bilmədi. Zəhmət olmasa icazələri yoxlayın.");
-                }
+                    e.target.reset();
+                } catch (err) { alert("Xəta baş verdi."); }
             }
         });
 
@@ -289,9 +395,19 @@
                 saveLocalData(data);
                 renderVaultItems(data);
             } else {
-                try { 
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'vault_items', id)); 
-                } catch (err) { console.error("Silinərkən xəta:", err); }
+                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'vault_items', id)); } 
+                catch (err) { console.error(err); }
+            }
+        };
+
+        window.updateItem = async (id, newData) => {
+            if (isLocalMode) {
+                const data = getLocalData().map(i => i.id === id ? {...i, ...newData} : i);
+                saveLocalData(data);
+                renderVaultItems(data);
+            } else {
+                try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'vault_items', id), newData); }
+                catch (err) { console.error(err); }
             }
         };
 
